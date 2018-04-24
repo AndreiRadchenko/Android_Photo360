@@ -1,23 +1,32 @@
 package unidesign.photo360
 
-import android.content.ContentValues
-import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
-import android.content.Context.WINDOW_SERVICE
 import android.os.Build
 import android.support.annotation.RequiresApi
-import android.support.design.widget.Snackbar
 import android.support.v7.widget.Toolbar
-import android.view.WindowManager
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
+import android.widget.EditText
+//import com.sun.org.apache.xml.internal.serializer.utils.Utils.messages
+import android.widget.TextView
+
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
+import java.net.URI
+import java.net.URISyntaxException
+import org.java_websocket.drafts.Draft_17
+import org.java_websocket.drafts.Draft_6455
 
 
 class MainActivity : AppCompatActivity() {
+
+    private var mWebSocketClient: WebSocketClient? = null
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,7 +77,7 @@ class MainActivity : AppCompatActivity() {
 //                    return false
 //                }
                 Toast.makeText(application, "Connect to turntable", Toast.LENGTH_LONG).show()
-
+                connectWebSocket()
                 return true
             }
 
@@ -82,5 +91,44 @@ class MainActivity : AppCompatActivity() {
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun connectWebSocket() {
+        val uri: URI
+        try {
+            uri = URI("ws://192.168.4.1:8000/")
+        } catch (e: URISyntaxException) {
+            e.printStackTrace()
+            return
+        }
+
+        mWebSocketClient = object : WebSocketClient(uri, Draft_6455()) {
+            override fun onOpen(serverHandshake: ServerHandshake) {
+                Log.i("Websocket", "Opened")
+                //mWebSocketClient?.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL)
+            }
+
+            override fun onMessage(s: String) {
+                runOnUiThread {
+//                    val textView = findViewById(R.id.messages) as TextView
+//                    textView.text = textView.text.toString() + "\n" + s
+                }
+            }
+
+            override fun onClose(i: Int, s: String, b: Boolean) {
+                Log.i("Websocket", "Closed $s")
+            }
+
+            override fun onError(e: Exception) {
+                Log.i("Websocket", "Error " + e.message)
+            }
+        }
+        mWebSocketClient!!.connect()
+    }
+
+    fun sendMessage(view: View) {
+        val editText = findViewById<View>(R.id.message) as EditText
+        mWebSocketClient!!.send(editText.text.toString())
+        editText.setText("")
     }
 }
