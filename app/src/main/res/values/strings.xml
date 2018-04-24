@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Photo360</string>
+    <string name="action_connect">Connect to turntable</string>
+    <string name="action_settings">Settings</string>
+</resources>
