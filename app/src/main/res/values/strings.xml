@@ -2,4 +2,16 @@
     <string name="app_name">Photo360</string>
     <string name="action_connect">Connect to turntable</string>
     <string name="action_settings">Settings</string>
+    <string name="preset_name">Preset name</string>
+    <string name="preset_frame">Frames number</string>
+    <string name="preset_delay">Shooting delay (ms)</string>
+    <string name="preset_speed">Speed</string>
+    <string name="preset_acceleration">Acceleration</string>
+    <string name="preset_edit_form">Preset edit</string>
+    <string-array name="shootingmode_array">
+        <item>Interval</item>
+        <item>Ping-Pong</item>
+        <item>Seria</item>
+        <item>Non stop</item>
+    </string-array>
 </resources>

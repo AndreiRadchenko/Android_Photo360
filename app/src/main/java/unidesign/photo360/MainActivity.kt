@@ -1,5 +1,6 @@
 package unidesign.photo360
 
+import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
@@ -11,6 +12,7 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Button
 import android.widget.Toast
 import android.widget.EditText
 //import com.sun.org.apache.xml.internal.serializer.utils.Utils.messages
@@ -27,11 +29,16 @@ import org.java_websocket.drafts.Draft_6455
 class MainActivity : AppCompatActivity() {
 
     private var mWebSocketClient: WebSocketClient? = null
+    private var menu: Menu? = null
+    //public val sharedPrefs = PreferenceManager(applicationContext)
+    //public val sharedPrefs = PreferenceManager(applicationContext)
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val sharedPrefs = PreferenceManager(applicationContext)
 
         val myToolbar = findViewById(R.id.main_activity_toolbar) as Toolbar
         setSupportActionBar(myToolbar)
@@ -47,18 +54,34 @@ class MainActivity : AppCompatActivity() {
         }
 
         view_pager.adapter = pageAdapter
-//        tabs.setupWithViewPager(view_pager)
+        val btnRunCW: Button = findViewById(R.id.button_run_cw)
+        val btnRunCCW: Button = findViewById(R.id.button_run_ccw)
+        val btnSTOP: Button = findViewById(R.id.button_stop)
 
-//        displayMetrics = DisplayMetrics()
-//        val windowmanager = applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
-//        windowmanager.defaultDisplay.getMetrics(displayMetrics)
-//        val tabwidth = Math.round(displayMetrics.widthPixels / displayMetrics.density/3)
+        btnRunCW.setOnClickListener(View.OnClickListener {
+            sharedPrefs.direction = 1
+            sharedPrefs.state = "start"
+            mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
+
+        })
+        btnRunCCW.setOnClickListener(View.OnClickListener {
+            sharedPrefs.direction = 0
+            sharedPrefs.state = "start"
+            mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
+
+        })
+        btnSTOP.setOnClickListener(View.OnClickListener {
+            sharedPrefs.state = "stop"
+            mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
+
+        })
 
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main_activity_appbar_menu, menu)
+        this.menu = menu;
         return true
     }
 
@@ -103,8 +126,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         mWebSocketClient = object : WebSocketClient(uri, Draft_6455()) {
+            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onOpen(serverHandshake: ServerHandshake) {
                 Log.i("Websocket", "Opened")
+                menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connected));
                 //mWebSocketClient?.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL)
             }
 
@@ -115,12 +140,16 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onClose(i: Int, s: String, b: Boolean) {
                 Log.i("Websocket", "Closed $s")
+                menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect));
             }
 
+            @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onError(e: Exception) {
                 Log.i("Websocket", "Error " + e.message)
+                menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect));
             }
         }
         mWebSocketClient!!.connect()

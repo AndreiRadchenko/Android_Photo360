@@ -1,19 +1,26 @@
 package unidesign.photo360
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.ViewGroup
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
 
 class PageFragment : Fragment() {
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_page, container, false)
         val page = getArguments()!!.getInt(PAGE_NUM)
 
         val tvHello: TextView = view.findViewById(R.id.tv_hello)
         tvHello.text = "Fragment $page"
+        val ivSettings: ImageView = view.findViewById(R.id.preset_settings)
+        ivSettings.setOnClickListener { startActivity(Intent("intent.action.presetedit")) }
+
         return view
     }
     companion object {

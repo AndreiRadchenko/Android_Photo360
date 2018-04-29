@@ -36,4 +36,40 @@
 
     </android.support.v4.view.ViewPager>
 
+    <RelativeLayout
+        android:id="@+id/buttons_layout"
+        android:layout_width="378dp"
+        android:layout_height="56dp"
+        android:layout_alignParentBottom="true"
+        app:layout_anchor="@+id/view_pager"
+        app:layout_anchorGravity="bottom|center"
+        tools:layout_editor_absoluteX="-1dp"
+        tools:layout_editor_absoluteY="503dp">
+
+        <Button
+            android:id="@+id/button_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="stop"
+            tools:text="stop" />
+
+        <Button
+            android:id="@+id/button_run_cw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toEndOf="@+id/button_stop"
+            android:text="turn cw"
+            tools:text="turn cw" />
+
+        <Button
+            android:id="@+id/button_run_ccw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@+id/button_stop"
+            android:text="turn ccw"
+            tools:text="turn ccw" />
+
+    </RelativeLayout>
+
 </android.support.design.widget.CoordinatorLayout>
