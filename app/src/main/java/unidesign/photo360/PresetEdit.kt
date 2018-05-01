@@ -24,12 +24,12 @@ import unidesign.photo360.MainActivity
 
 class PresetEdit : AppCompatActivity() {
 
-//    internal val etName: EditText = findViewById<View>(R.id.etName) as EditText
-//    internal val etFrame: EditText = findViewById<View>(R.id.etFrame) as EditText
-//    internal val etDelay: EditText = findViewById<View>(R.id.etDelay) as EditText
-//    internal val etSpeed: EditText = findViewById<View>(R.id.etSpeed) as EditText
-//    internal val etAcceleration: EditText = findViewById<View>(R.id.etAcceleration) as EditText
-//    internal val etShootingMode: Spinner = findViewById<View>(R.id.etShootingMode) as Spinner
+    lateinit var etName: EditText
+    lateinit var etFrame: EditText
+    lateinit var etDelay: EditText
+    lateinit var etSpeed: EditText
+    lateinit var etAcceleration: EditText
+    lateinit var etShootingMode: Spinner
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -53,18 +53,13 @@ class PresetEdit : AppCompatActivity() {
         ab!!.setDisplayHomeAsUpEnabled(true)
 
 
-//        etName = findViewById<View>(R.id.etName) as EditText
-//        etFrame = findViewById<View>(R.id.etFrame) as EditText
-//        etDelay = findViewById<View>(R.id.etDelay) as EditText
-//        etSpeed = findViewById<View>(R.id.etSpeed) as EditText
-//        etAcceleration = findViewById<View>(R.id.etAcceleration) as EditText
-         val etName: EditText = findViewById<View>(R.id.etName) as EditText
-         val etFrame: EditText = findViewById<View>(R.id.etFrame) as EditText
-         val etDelay: EditText = findViewById<View>(R.id.etDelay) as EditText
-         val etSpeed: EditText = findViewById<View>(R.id.etSpeed) as EditText
-         val etAcceleration: EditText = findViewById<View>(R.id.etAcceleration) as EditText
-         val etShootingMode: Spinner = findViewById<View>(R.id.etShootingMode) as Spinner
-//        etShootingMode = findViewById<View>(R.id.etShootingMode) as Spinner
+        etName = findViewById<View>(R.id.etName) as EditText
+        etFrame = findViewById<View>(R.id.etFrame) as EditText
+        etDelay = findViewById<View>(R.id.etDelay) as EditText
+        etSpeed = findViewById<View>(R.id.etSpeed) as EditText
+        etAcceleration = findViewById<View>(R.id.etAcceleration) as EditText
+        etShootingMode = findViewById<View>(R.id.etShootingMode) as Spinner
+
         // Create an ArrayAdapter using the string array and a default spinner layout
         val adapter = ArrayAdapter.createFromResource(this,
                 R.array.shootingmode_array, android.R.layout.simple_spinner_item)
@@ -74,11 +69,11 @@ class PresetEdit : AppCompatActivity() {
         etShootingMode.adapter = adapter
 
         //etName.setText(MainActivity.sharedPrefs.);
-//        etFrame.setText(sharedPrefs.frame)
-//        etDelay.setText(sharedPrefs.delay)
-//        etSpeed.setText(sharedPrefs.speed)
-//        etAcceleration.setText(sharedPrefs.acceleration)
-        //etShootingMode.setText(sharedPrefs.getFrame());
+        etFrame.setText(sharedPrefs.frame.toString())
+        etDelay.setText(sharedPrefs.delay.toString())
+        etSpeed.setText(sharedPrefs.speed.toString())
+        etAcceleration.setText(sharedPrefs.acceleration.toString())
+        //etShootingMode.set(sharedPrefs.shootingMode)
 
         etShootingMode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View,
