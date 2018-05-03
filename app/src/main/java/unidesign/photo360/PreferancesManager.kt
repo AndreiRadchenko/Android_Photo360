@@ -15,6 +15,13 @@ class PreferenceManager(internal var _context: Context) {
     // shared pref mode
     internal var PRIVATE_MODE = 0
 
+    var presetName: String
+        get() = pref.getString(PRESET_NAME, "Preset 1")
+        set(mpresetName) {
+            editor.putString(PRESET_NAME, mpresetName)
+            editor.commit()
+        }
+
     var firmwareVersion: String
         get() = pref.getString(FIRMWARE_VERSION, "Photo360 AP")
         set(mfirmwareVersion) {
@@ -146,6 +153,7 @@ class PreferenceManager(internal var _context: Context) {
         // Shared preferences file name
         private val PREF_NAME = "Photo360_Preferences"
 
+        private val PRESET_NAME = "presetName"
         private val FIRMWARE_VERSION = "firmwareVersion"
         private val WIFI_SSID = "wifiSsid"
         private val WIFI_PASSWORD = "wifiPassword"

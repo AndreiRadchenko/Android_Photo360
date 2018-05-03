@@ -1,22 +1,22 @@
 package unidesign.photo360
 
+import android.app.ProgressDialog
 import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
 import android.os.Build
 import android.support.annotation.RequiresApi
+import android.support.design.R.id.visible
 import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Button
-import android.widget.Toast
-import android.widget.EditText
+import android.widget.*
 //import com.sun.org.apache.xml.internal.serializer.utils.Utils.messages
-import android.widget.TextView
+import org.java_websocket.WebSocket
 
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -24,12 +24,14 @@ import java.net.URI
 import java.net.URISyntaxException
 import org.java_websocket.drafts.Draft_17
 import org.java_websocket.drafts.Draft_6455
+import org.java_websocket.exceptions.WebsocketNotConnectedException
 
 
 class MainActivity : AppCompatActivity() {
 
     private var mWebSocketClient: WebSocketClient? = null
     private var menu: Menu? = null
+    lateinit var mprogresBar: ProgressBar
     //public val sharedPrefs = PreferenceManager(applicationContext)
     //public val sharedPrefs = PreferenceManager(applicationContext)
 
@@ -54,6 +56,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         view_pager.adapter = pageAdapter
+        mprogresBar = findViewById(R.id.progressBar)
         val btnRunCW: Button = findViewById(R.id.button_run_cw)
         val btnRunCCW: Button = findViewById(R.id.button_run_ccw)
         val btnSTOP: Button = findViewById(R.id.button_stop)
@@ -61,19 +64,31 @@ class MainActivity : AppCompatActivity() {
         btnRunCW.setOnClickListener(View.OnClickListener {
             sharedPrefs.direction = 1
             sharedPrefs.state = "start"
-            mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
-
+            try {
+                mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
+            }
+            catch (e: Exception) {
+                Toast.makeText(application, "Turnable not connected", Toast.LENGTH_LONG).show()
+            }
         })
         btnRunCCW.setOnClickListener(View.OnClickListener {
             sharedPrefs.direction = 0
             sharedPrefs.state = "start"
-            mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
-
+            try {
+                mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
+            }
+            catch (e: Exception) {
+                Toast.makeText(application, "Turnable not connected", Toast.LENGTH_LONG).show()
+            }
         })
         btnSTOP.setOnClickListener(View.OnClickListener {
             sharedPrefs.state = "stop"
-            mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
-
+            try {
+                mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
+            }
+            catch (e: Exception) {
+                Toast.makeText(application, "Turnable not connected", Toast.LENGTH_LONG).show()
+            }
         })
 
     }
@@ -85,6 +100,7 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
 
@@ -92,15 +108,19 @@ class MainActivity : AppCompatActivity() {
             R.id.action_connect -> {
                 // User chose the "Settings" item, show the app settings UI...
                 /*                Snackbar.make(findViewById(R.id.ussd_toolbar), "Replace done with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();*/
+                        .setAction("Action", null).show();
 
-//                if (name.length == 0 && template.length == 0) {
-//                    Snackbar.make(findViewById(R.id.ussd_toolbar), R.string.snackbar_fill_form, Snackbar.LENGTH_LONG)
-//                            .setAction("Action", null).show()
-//                    return false
-//                }
-                Toast.makeText(application, "Connect to turntable", Toast.LENGTH_LONG).show()
+                if (name.length == 0 && template.length == 0) {
+                    Snackbar.make(findViewById(R.id.ussd_toolbar), R.string.snackbar_fill_form, Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show()
+                    return false
+                }*/
+                Toast.makeText(application, "Connect to turntable", Toast.LENGTH_SHORT).show()
+                menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected));
+                mprogresBar.visibility = View.VISIBLE
                 connectWebSocket()
+                   // menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect))
+
                 return true
             }
 
@@ -116,21 +136,24 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun connectWebSocket() {
+    private fun connectWebSocket(): Boolean {
         val uri: URI
         try {
             uri = URI("ws://192.168.4.1:8000/")
         } catch (e: URISyntaxException) {
             e.printStackTrace()
-            return
+            return false
         }
 
         mWebSocketClient = object : WebSocketClient(uri, Draft_6455()) {
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+            //var
             override fun onOpen(serverHandshake: ServerHandshake) {
                 Log.i("Websocket", "Opened")
-                menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connected));
-                //mWebSocketClient?.send("Hello from " + Build.MANUFACTURER + " " + Build.MODEL)
+                runOnUiThread {
+                    mprogresBar.visibility = View.INVISIBLE
+                    Toast.makeText(application, "Turntable connected", Toast.LENGTH_LONG).show()
+                }
             }
 
             override fun onMessage(s: String) {
@@ -143,16 +166,26 @@ class MainActivity : AppCompatActivity() {
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onClose(i: Int, s: String, b: Boolean) {
                 Log.i("Websocket", "Closed $s")
-                menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect));
+                if (getReadyState() != WebSocket.READYSTATE.NOT_YET_CONNECTED)
+                runOnUiThread {
+                    mprogresBar.visibility = View.INVISIBLE
+                    menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect))
+                    Toast.makeText(application, "Turntable disconnected", Toast.LENGTH_LONG).show()
+                }
             }
 
             @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
             override fun onError(e: Exception) {
                 Log.i("Websocket", "Error " + e.message)
-                menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect));
+                runOnUiThread {
+                    mprogresBar.visibility = View.INVISIBLE
+                    menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect))
+                    Toast.makeText(application, "Turntable not found", Toast.LENGTH_LONG).show()
+                }
             }
         }
-        mWebSocketClient!!.connect()
+        mWebSocketClient?.connect()
+        return true
     }
 
     fun sendMessage(view: View) {

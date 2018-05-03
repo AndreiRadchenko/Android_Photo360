@@ -1,13 +1,9 @@
 package unidesign.photo360
 
-import android.app.Activity
 import android.content.ContentValues
-import android.content.SharedPreferences
-import android.database.Cursor
-import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.app.ActionBar
+import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
@@ -16,11 +12,10 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
 import android.widget.Toast
-import unidesign.photo360.MainActivity
+import java.util.*
 
 class PresetEdit : AppCompatActivity() {
 
@@ -30,20 +25,19 @@ class PresetEdit : AppCompatActivity() {
     lateinit var etSpeed: EditText
     lateinit var etAcceleration: EditText
     lateinit var etShootingMode: Spinner
+    lateinit var sharedPrefs: PreferenceManager
+
+    enum class ShootingMode {
+        inter, PingP, seria, nonST
+    }
+
+    val shootingModemap: HashMap<String, Int> = hashMapOf("inter" to 0, "PingP" to 1, "seria" to 2, "nonST" to 3)
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
-        // Use the chosen theme
-        //        SharedPreferences sharedPrefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this);
-        //        boolean useDarkTheme = sharedPrefs.getBoolean(pref_items.pref_DarkTheme, false);
-        //
-        //        if(useDarkTheme) {
-        //            setTheme(R.style.Theme_Dark);
-        //        }
-
         super.onCreate(savedInstanceState)
         setContentView(R.layout.preset_edit)
-        val sharedPrefs = PreferenceManager(applicationContext)
+        sharedPrefs = PreferenceManager(applicationContext)
         val myToolbar = findViewById<View>(R.id.preset_edit_toolbar) as Toolbar
         setSupportActionBar(myToolbar)
         // Get a support ActionBar corresponding to this toolbar
@@ -51,7 +45,6 @@ class PresetEdit : AppCompatActivity() {
 
         // Enable the Up button
         ab!!.setDisplayHomeAsUpEnabled(true)
-
 
         etName = findViewById<View>(R.id.etName) as EditText
         etFrame = findViewById<View>(R.id.etFrame) as EditText
@@ -68,12 +61,13 @@ class PresetEdit : AppCompatActivity() {
         // Apply the adapter to the spinner
         etShootingMode.adapter = adapter
 
-        //etName.setText(MainActivity.sharedPrefs.);
+        etName.setText(sharedPrefs.presetName);
         etFrame.setText(sharedPrefs.frame.toString())
         etDelay.setText(sharedPrefs.delay.toString())
         etSpeed.setText(sharedPrefs.speed.toString())
         etAcceleration.setText(sharedPrefs.acceleration.toString())
-        //etShootingMode.set(sharedPrefs.shootingMode)
+        etShootingMode.setSelection( shootingModemap.get(sharedPrefs.shootingMode)!!)
+        //= sharedPrefs.shootingMode
 
         etShootingMode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View,
@@ -102,7 +96,7 @@ class PresetEdit : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        //getMenuInflater().inflate(R.menu.ussd_appbar_menu, menu);
+        getMenuInflater().inflate(R.menu.pref_edit_menu, menu);
         return true
     }
 
@@ -114,21 +108,24 @@ class PresetEdit : AppCompatActivity() {
         // создаем объект для данных
         val values = ContentValues()
 
-        // получаем данные из полей ввода
+        //получаем данные из полей ввода
         //String name = etName.getText().toString();
         //String comment = etComment.getText().toString();
         //String template = etTemplate.getText().toString();
 
         when (item.itemId) {
-        //            case R.id.action_done:
-        //                //Toast.makeText(getApplication(), R.string.template_saved, Toast.LENGTH_LONG).show();
-        //                finish();
-        //                return true;
-        //
-        //            case R.id.action_copy:
-        //                finish();
-        //                return true;
-        //
+            R.id.action_save -> {
+                sharedPrefs.presetName = etName.text.toString()
+                sharedPrefs.frame = etFrame.text.toString().toInt()
+                sharedPrefs.delay = etDelay.text.toString().toInt()
+                sharedPrefs.speed = etSpeed.text.toString().toInt()
+                sharedPrefs.acceleration = etAcceleration.text.toString().toInt()
+                sharedPrefs.shootingMode = getKeyByValue(shootingModemap, etShootingMode.selectedItemPosition) ?: "inter"
+                Log.d("action_save", sharedPrefs.shootingMode)
+                Toast.makeText(applicationContext, R.string.preferences_saved, Toast.LENGTH_LONG).show()
+                finish()
+                return true
+            }
             else ->
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
@@ -136,4 +133,13 @@ class PresetEdit : AppCompatActivity() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.KITKAT)
+    fun <T, E> getKeyByValue(map: Map<T, E>, value: E): T? {
+        for ((key, value1) in map) {
+            if (Objects.equals(value, value1)) {
+                return key
+            }
+        }
+        return null
+    }
 }
