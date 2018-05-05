@@ -2,10 +2,14 @@ package unidesign.photo360
 
 import android.app.ProgressDialog
 import android.content.Context
+import android.net.wifi.WifiConfiguration
+import android.net.wifi.WifiInfo
+import android.net.wifi.WifiManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
 import android.os.Build
+import android.os.Handler
 import android.support.annotation.RequiresApi
 import android.support.design.R.id.visible
 import android.support.v7.widget.Toolbar
@@ -32,6 +36,15 @@ class MainActivity : AppCompatActivity() {
     private var mWebSocketClient: WebSocketClient? = null
     private var menu: Menu? = null
     lateinit var mprogresBar: ProgressBar
+//    var networkSSID = "test"
+//    var networkPass = "pass"
+    lateinit var wifiConf: WifiConfiguration
+    lateinit var wifiManager: WifiManager
+    lateinit var sharedPrefs: PreferenceManager
+    lateinit var homeWiFiInfo: WifiInfo
+    lateinit var btnRunCW: Button
+    lateinit var btnRunCCW: Button
+    lateinit var btnSTOP: Button
     //public val sharedPrefs = PreferenceManager(applicationContext)
     //public val sharedPrefs = PreferenceManager(applicationContext)
 
@@ -40,7 +53,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val sharedPrefs = PreferenceManager(applicationContext)
+        sharedPrefs = PreferenceManager(applicationContext)
+        wifiConf =  WifiConfiguration()
+        wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
         val myToolbar = findViewById(R.id.main_activity_toolbar) as Toolbar
         setSupportActionBar(myToolbar)
@@ -57,9 +72,10 @@ class MainActivity : AppCompatActivity() {
 
         view_pager.adapter = pageAdapter
         mprogresBar = findViewById(R.id.progressBar)
-        val btnRunCW: Button = findViewById(R.id.button_run_cw)
-        val btnRunCCW: Button = findViewById(R.id.button_run_ccw)
-        val btnSTOP: Button = findViewById(R.id.button_stop)
+        btnRunCW = findViewById(R.id.button_run_cw)
+        btnRunCCW = findViewById(R.id.button_run_ccw)
+        btnSTOP = findViewById(R.id.button_stop)
+        disableButton()
 
         btnRunCW.setOnClickListener(View.OnClickListener {
             sharedPrefs.direction = 1
@@ -68,7 +84,7 @@ class MainActivity : AppCompatActivity() {
                 mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
             }
             catch (e: Exception) {
-                Toast.makeText(application, "Turnable not connected", Toast.LENGTH_LONG).show()
+                Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
             }
         })
         btnRunCCW.setOnClickListener(View.OnClickListener {
@@ -78,7 +94,7 @@ class MainActivity : AppCompatActivity() {
                 mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
             }
             catch (e: Exception) {
-                Toast.makeText(application, "Turnable not connected", Toast.LENGTH_LONG).show()
+                Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
             }
         })
         btnSTOP.setOnClickListener(View.OnClickListener {
@@ -87,10 +103,24 @@ class MainActivity : AppCompatActivity() {
                 mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
             }
             catch (e: Exception) {
-                Toast.makeText(application, "Turnable not connected", Toast.LENGTH_LONG).show()
+                Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
             }
         })
 
+    }
+
+    private fun disableButton() {
+        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        btnRunCW.isEnabled = false
+        btnRunCCW.isEnabled = false
+        btnSTOP.isEnabled = false
+    }
+
+    private fun enableButton() {
+        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        btnRunCW.isEnabled = true
+        btnRunCCW.isEnabled = true
+        btnSTOP.isEnabled = true
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -106,20 +136,25 @@ class MainActivity : AppCompatActivity() {
 
         when (item.itemId) {
             R.id.action_connect -> {
-                // User chose the "Settings" item, show the app settings UI...
-                /*                Snackbar.make(findViewById(R.id.ussd_toolbar), "Replace done with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                if (!(mWebSocketClient?.isOpen ?: false)) {
+                    /*                Snackbar.make(findViewById(R.id.ussd_toolbar), "Replace done with your own action", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
 
-                if (name.length == 0 && template.length == 0) {
-                    Snackbar.make(findViewById(R.id.ussd_toolbar), R.string.snackbar_fill_form, Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show()
-                    return false
-                }*/
-                Toast.makeText(application, "Connect to turntable", Toast.LENGTH_SHORT).show()
-                menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected));
-                mprogresBar.visibility = View.VISIBLE
-                connectWebSocket()
-                   // menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect))
+                    if (name.length == 0 && template.length == 0) {
+                        Snackbar.make(findViewById(R.id.ussd_toolbar), R.string.snackbar_fill_form, Snackbar.LENGTH_LONG)
+                                .setAction("Action", null).show()
+                        return false
+                    }*/
+                    menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected));
+                    mprogresBar.visibility = View.VISIBLE
+                    connect2Photo360WiFi(sharedPrefs.wifiSsid, sharedPrefs.wifiPassword)
+//                    connectWebSocket()
+                }
+                else {
+                    //Toast.makeText(application, "Disconnect from turntable", Toast.LENGTH_SHORT).show()
+                    menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connect));
+                    disconnectFromPhoto360WiFi()
+                }
 
                 return true
             }
@@ -133,6 +168,60 @@ class MainActivity : AppCompatActivity() {
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun connect2Photo360WiFi(networkSSID: String, networkPass: String) {
+        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        homeWiFiInfo = wifiManager.connectionInfo
+        wifiConf.SSID = "\"" + networkSSID + "\""
+        //wifiConf.preSharedKey = "\"" + networkPass + "\""
+        wifiConf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        wifiManager.addNetwork(wifiConf)
+
+        //if no WiFi connection allowed
+        if (!wifiManager.isWifiEnabled) {
+            Toast.makeText(application, "Please, enable WiFi connection", Toast.LENGTH_SHORT).show()
+            mprogresBar.visibility = View.INVISIBLE
+            menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect))
+            return
+        }
+
+        Toast.makeText(application, "Connect to turntable", Toast.LENGTH_SHORT).show()
+        var list: List<WifiConfiguration> = wifiManager.getConfiguredNetworks()
+        for(  i: WifiConfiguration in list ) {
+             if(i.SSID != null && i.SSID.equals("\"" + networkSSID + "\"")) {
+                 wifiManager.disconnect()
+                 wifiManager.enableNetwork(i.networkId, true)
+                 wifiManager.reconnect()
+                 //wifiManager.connectionInfo.ssid
+                 break;
+            }
+        }
+        Handler().postDelayed(Runnable {
+            // do something...
+            connectWebSocket()
+        }, 4000)
+    }
+
+    private fun disconnectFromPhoto360WiFi() {
+        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        //wifiConf.SSID = "\"" + homeWiFiInfo.ssid + "\""
+        //wifiConf.preSharedKey = "\"" + homeWiFiInfo. + "\""
+        //wifiConf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        //wifiManager.addNetwork(wifiConf)
+        disconnectWebSocket()
+
+        var list: List<WifiConfiguration> = wifiManager.getConfiguredNetworks()
+        for(  i: WifiConfiguration in list ) {
+            if(i.SSID != null && i.SSID.equals(homeWiFiInfo.ssid)) {
+                wifiManager.disconnect()
+                wifiManager.enableNetwork(i.networkId, true)
+                wifiManager.reconnect()
+                //wifiManager.connectionInfo.ssid
+                break;
+            }
         }
     }
 
@@ -152,7 +241,8 @@ class MainActivity : AppCompatActivity() {
                 Log.i("Websocket", "Opened")
                 runOnUiThread {
                     mprogresBar.visibility = View.INVISIBLE
-                    Toast.makeText(application, "Turntable connected", Toast.LENGTH_LONG).show()
+                    Toast.makeText(application, "Turntable connected", Toast.LENGTH_SHORT).show()
+                    enableButton()
                 }
             }
 
@@ -170,7 +260,8 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     mprogresBar.visibility = View.INVISIBLE
                     menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect))
-                    Toast.makeText(application, "Turntable disconnected", Toast.LENGTH_LONG).show()
+                    Toast.makeText(application, "Turntable disconnected", Toast.LENGTH_SHORT).show()
+                    disableButton()
                 }
             }
 
@@ -180,12 +271,17 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     mprogresBar.visibility = View.INVISIBLE
                     menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect))
-                    Toast.makeText(application, "Turntable not found", Toast.LENGTH_LONG).show()
+                    Toast.makeText(application, "Turntable not found", Toast.LENGTH_SHORT).show()
+                    disableButton()
                 }
             }
         }
         mWebSocketClient?.connect()
         return true
+    }
+
+    private fun disconnectWebSocket() {
+        mWebSocketClient?.close()
     }
 
     fun sendMessage(view: View) {
