@@ -12,6 +12,7 @@ import android.os.Build
 import android.os.Handler
 import android.support.annotation.RequiresApi
 import android.support.design.R.id.visible
+import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
 import android.util.Log
@@ -19,6 +20,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import kotlinx.android.synthetic.main.fragment_page.*
 //import com.sun.org.apache.xml.internal.serializer.utils.Utils.messages
 import org.java_websocket.WebSocket
 
@@ -29,6 +31,7 @@ import java.net.URISyntaxException
 import org.java_websocket.drafts.Draft_17
 import org.java_websocket.drafts.Draft_6455
 import org.java_websocket.exceptions.WebsocketNotConnectedException
+import org.json.JSONObject
 
 
 class MainActivity : AppCompatActivity() {
@@ -40,13 +43,21 @@ class MainActivity : AppCompatActivity() {
 //    var networkPass = "pass"
     lateinit var wifiConf: WifiConfiguration
     lateinit var wifiManager: WifiManager
-    lateinit var sharedPrefs: PreferenceManager
+    //public lateinit var sharedPrefs: PreferenceManager
     lateinit var homeWiFiInfo: WifiInfo
     lateinit var btnRunCW: Button
     lateinit var btnRunCCW: Button
     lateinit var btnSTOP: Button
+    lateinit var framesLeftTxt: TextView
+    lateinit var turntableView: TurntableView
+    lateinit var mViewPager: ViewPager
+    lateinit var pageAdapter: PageAdapter
     //public val sharedPrefs = PreferenceManager(applicationContext)
     //public val sharedPrefs = PreferenceManager(applicationContext)
+    companion object {
+        var sharedPrefs: PreferenceManager? = null
+        var currentFragmentId: Int = 0
+    }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,7 +73,7 @@ class MainActivity : AppCompatActivity() {
         // Get a support ActionBar corresponding to this toolbar
         val ab = supportActionBar
 
-        val pageAdapter = PageAdapter(supportFragmentManager)
+        pageAdapter = PageAdapter(supportFragmentManager)
         var displayMetrics: DisplayMetrics? = null
 
         // create fragments from 0 to 9
@@ -71,6 +82,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         view_pager.adapter = pageAdapter
+        mViewPager = findViewById(R.id.view_pager)
+
         mprogresBar = findViewById(R.id.progressBar)
         btnRunCW = findViewById(R.id.button_run_cw)
         btnRunCCW = findViewById(R.id.button_run_ccw)
@@ -78,35 +91,52 @@ class MainActivity : AppCompatActivity() {
         disableButton()
 
         btnRunCW.setOnClickListener(View.OnClickListener {
-            sharedPrefs.direction = 1
-            sharedPrefs.state = "start"
+            sharedPrefs?.direction = 1
+            sharedPrefs?.state = "start"
+
+            currentFragmentId = mViewPager.currentItem
+            var currentFragment = pageAdapter.getItem(currentFragmentId)
+            framesLeftTxt = currentFragment.frames_left_txt
+
             try {
-                mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
+                mWebSocketClient!!.send(sharedPrefs?.getJSON().toString())
             }
             catch (e: Exception) {
                 Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
             }
         })
         btnRunCCW.setOnClickListener(View.OnClickListener {
-            sharedPrefs.direction = 0
-            sharedPrefs.state = "start"
+            sharedPrefs?.direction = 0
+            sharedPrefs?.state = "start"
+
+            currentFragmentId = mViewPager.currentItem
+            var currentFragment = pageAdapter.getItem(currentFragmentId)
+            framesLeftTxt = currentFragment.frames_left_txt
+
             try {
-                mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
+                mWebSocketClient!!.send(sharedPrefs?.getJSON().toString())
             }
             catch (e: Exception) {
                 Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
             }
         })
         btnSTOP.setOnClickListener(View.OnClickListener {
-            sharedPrefs.state = "stop"
+            sharedPrefs?.state = "stop"
             try {
-                mWebSocketClient!!.send(sharedPrefs.getJSON().toString())
+                mWebSocketClient!!.send(sharedPrefs?.getJSON().toString())
             }
             catch (e: Exception) {
                 Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
             }
         })
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+//        var currentFragment = pageAdapter.getItem(mViewPager.currentItem)
+//        framesLeftTxt = currentFragment.frames_left_txt
+//        framesLeftTxt.setText(sharedPrefs.frame)
     }
 
     private fun disableButton() {
@@ -147,7 +177,7 @@ class MainActivity : AppCompatActivity() {
                     }*/
                     menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected));
                     mprogresBar.visibility = View.VISIBLE
-                    connect2Photo360WiFi(sharedPrefs.wifiSsid, sharedPrefs.wifiPassword)
+                    connect2Photo360WiFi(sharedPrefs?.wifiSsid, sharedPrefs?.wifiPassword)
 //                    connectWebSocket()
                 }
                 else {
@@ -172,7 +202,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun connect2Photo360WiFi(networkSSID: String, networkPass: String) {
+    private fun connect2Photo360WiFi(networkSSID: String?, networkPass: String?) {
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         homeWiFiInfo = wifiManager.connectionInfo
         wifiConf.SSID = "\"" + networkSSID + "\""
@@ -248,8 +278,18 @@ class MainActivity : AppCompatActivity() {
 
             override fun onMessage(s: String) {
                 runOnUiThread {
-//                    val textView = findViewById(R.id.messages) as TextView
-//                    textView.text = textView.text.toString() + "\n" + s
+
+                    var esp32answer = JSONObject(s)
+                    var frameleft = esp32answer.getInt(PreferenceManager.FRAMES_LEFT)
+                    Log.d("onMessage()", PreferenceManager.FRAMES_LEFT + ": " + frameleft)
+                    sharedPrefs?.framesLeft = frameleft
+
+                    var currentFragment = pageAdapter.getItem(currentFragmentId)
+                    if (currentFragment.isVisible) {
+                        framesLeftTxt = currentFragment.frames_left_txt
+                        framesLeftTxt.setText(frameleft.toString())
+                        framesLeftTxt.invalidate()
+                    }
                 }
             }
 

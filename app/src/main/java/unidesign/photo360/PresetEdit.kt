@@ -117,6 +117,7 @@ class PresetEdit : AppCompatActivity() {
             R.id.action_save -> {
                 sharedPrefs.presetName = etName.text.toString()
                 sharedPrefs.frame = etFrame.text.toString().toInt()
+                sharedPrefs.framesLeft = etFrame.text.toString().toInt()
                 sharedPrefs.delay = etDelay.text.toString().toInt()
                 sharedPrefs.speed = etSpeed.text.toString().toInt()
                 sharedPrefs.acceleration = etAcceleration.text.toString().toInt()
