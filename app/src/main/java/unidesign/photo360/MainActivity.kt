@@ -16,6 +16,7 @@ import android.os.Bundle
 import kotlinx.android.synthetic.main.activity_main.*
 import android.os.Build
 import android.os.Handler
+import android.os.Message
 import android.provider.Contacts
 import android.support.annotation.RequiresApi
 import android.support.annotation.UiThread
@@ -43,13 +44,14 @@ import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.json.JSONObject
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlinx.coroutines.experimental.android.UI
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity() {
 
-    private var mWebSocketClient: WebSocketClient? = null
-    private var menu: Menu? = null
     lateinit var mprogresBar: ProgressBar
 //    var networkSSID = "test"
 //    var networkPass = "pass"
@@ -75,6 +77,9 @@ class MainActivity : AppCompatActivity() {
         var currentFragmentId: Int = 0
         lateinit var wifiManager: WifiManager
         var fireWiFiScan = false
+        var wsConnected = false
+        var mWebSocketClient: WebSocketClient? = null
+        var menu: Menu? = null
     }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -99,8 +104,8 @@ class MainActivity : AppCompatActivity() {
             pageAdapter.add(PageFragment.newInstance(i), "Tab$i")
         }
 
-        view_pager.adapter = pageAdapter
         mViewPager = findViewById(R.id.view_pager)
+        mViewPager.adapter = pageAdapter
 
         mprogresBar = findViewById(R.id.progressBar)
         btnRunCW = findViewById(R.id.button_run_cw)
@@ -113,8 +118,8 @@ class MainActivity : AppCompatActivity() {
             sharedPrefs?.state = "start"
 
             currentFragmentId = mViewPager.currentItem
-            var currentFragment = pageAdapter.getItem(currentFragmentId)
-            framesLeftTxt = currentFragment.frames_left_txt
+            //var currentFragment = pageAdapter.getItem(currentFragmentId)
+            //framesLeftTxt = currentFragment.view!!.findViewById(R.id.frames_left_txt)
 
             try {
                 mWebSocketClient!!.send(sharedPrefs?.getJSON().toString())
@@ -128,8 +133,8 @@ class MainActivity : AppCompatActivity() {
             sharedPrefs?.state = "start"
 
             currentFragmentId = mViewPager.currentItem
-            var currentFragment = pageAdapter.getItem(currentFragmentId)
-            framesLeftTxt = currentFragment.frames_left_txt
+            //var currentFragment = pageAdapter.getItem(currentFragmentId)
+            //framesLeftTxt = currentFragment.view!!.findViewById(R.id.frames_left_txt)
 
             try {
                 mWebSocketClient!!.send(sharedPrefs?.getJSON().toString())
@@ -150,11 +155,28 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+
+    override fun onSaveInstanceState(savedInstanceState: Bundle)
+    {
+        super.onSaveInstanceState(savedInstanceState)
+        savedInstanceState.putInt("FragmentId", currentFragmentId)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle)
+    {
+        super.onRestoreInstanceState(savedInstanceState)
+        currentFragmentId = savedInstanceState.getInt("FragmentId")
+    }
+
     override fun onResume() {
         super.onResume()
-//        var currentFragment = pageAdapter.getItem(mViewPager.currentItem)
-//        framesLeftTxt = currentFragment.frames_left_txt
-//        framesLeftTxt.setText(sharedPrefs.frame)
+
+        if (wsConnected)
+        {
+            enableButton()
+            menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected))
+        }
+        mViewPager.currentItem = currentFragmentId
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
             if(checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -167,21 +189,35 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onStart() {
         super.onStart()
+        EventBus.getDefault().register(this)
         TurntableConectionJob = Job()
         wifiScanReceiver = WifiScanReceiver()
         registerReceiver(wifiScanReceiver, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
-        connectWebSocket()
+        //connectWebSocket()
     }
 
     override fun onStop() {
-        super.onStop()
+        EventBus.getDefault().unregister(this)
         unregisterReceiver(wifiScanReceiver)
-        disconnectWebSocket()
+        super.onStop()
+        //disconnectWebSocket()
     }
 
     override fun onDestroy() {
         super.onDestroy()
         TurntableConectionJob.cancel()
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public fun onMessage(event: wsMessage){
+        var currentFragment = pageAdapter.getItem(currentFragmentId)
+        if (currentFragment.isVisible) {
+            //var currentFragment = pageAdapter.getItem(currentFragmentId)
+            framesLeftTxt = currentFragment.view!!.findViewById(R.id.frames_left_txt)
+            framesLeftTxt.setText(event.message)
+            framesLeftTxt.invalidate()
+        }
+    //mytextview.setText(event.message);
     }
 
     private fun disableButton() {
@@ -201,7 +237,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main_activity_appbar_menu, menu)
-        this.menu = menu;
+        Companion.menu = menu;
+        if (wsConnected)
+            Companion.menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected))
         return true
     }
 
@@ -211,7 +249,7 @@ class MainActivity : AppCompatActivity() {
 
         when (item.itemId) {
             R.id.action_connect -> {
-                if (!(mWebSocketClient?.isOpen ?: false)) {
+                if (!wsConnected) {
                     //if no WiFi connection allowed
                     if (!wifiManager.isWifiEnabled){
                         Toast.makeText(application, "Please, enable WiFi connection", Toast.LENGTH_SHORT).show()
@@ -228,7 +266,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 else {
                     //Toast.makeText(application, "Disconnect from turntable", Toast.LENGTH_SHORT).show()
-                    menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connect));
+                    menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connect))
                     disconnectFromPhoto360WiFi()
                 }
 
@@ -355,6 +393,7 @@ class MainActivity : AppCompatActivity() {
             override fun onOpen(serverHandshake: ServerHandshake) {
                 Log.i("Websocket", "Opened")
                 runOnUiThread {
+                    wsConnected = true
                     menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected))
                     mprogresBar.visibility = View.INVISIBLE
                     Toast.makeText(application, "Turntable connected", Toast.LENGTH_SHORT).show()
@@ -363,19 +402,20 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onMessage(s: String) {
+                var esp32answer = JSONObject(s)
+                var frameleft = esp32answer.getInt(PreferenceManager.FRAMES_LEFT)
+                EventBus.getDefault().post(wsMessage(frameleft.toString()))
                 runOnUiThread {
-
-                    var esp32answer = JSONObject(s)
-                    var frameleft = esp32answer.getInt(PreferenceManager.FRAMES_LEFT)
                     Log.d("onMessage()", PreferenceManager.FRAMES_LEFT + ": " + frameleft)
                     sharedPrefs?.framesLeft = frameleft
 
-                    var currentFragment = pageAdapter.getItem(currentFragmentId)
-                    if (currentFragment.isVisible) {
-                        framesLeftTxt = currentFragment.frames_left_txt
-                        framesLeftTxt.setText(frameleft.toString())
-                        framesLeftTxt.invalidate()
-                    }
+//                    var currentFragment = pageAdapter.getItem(currentFragmentId)
+//                    if (currentFragment.isVisible) {
+//                        //var currentFragment = pageAdapter.getItem(currentFragmentId)
+//                        framesLeftTxt = currentFragment.view!!.findViewById(R.id.frames_left_txt)
+//                        framesLeftTxt.setText(frameleft.toString())
+//                        framesLeftTxt.invalidate()
+//                    }
                 }
             }
 
@@ -384,6 +424,7 @@ class MainActivity : AppCompatActivity() {
                 Log.i("Websocket", "Closed $s")
                 if (getReadyState() != WebSocket.READYSTATE.NOT_YET_CONNECTED)
                 runOnUiThread {
+                    wsConnected = false
                     mprogresBar.visibility = View.INVISIBLE
                     menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect))
                     Toast.makeText(application, "Turntable disconnected", Toast.LENGTH_SHORT).show()
@@ -395,6 +436,7 @@ class MainActivity : AppCompatActivity() {
             override fun onError(e: Exception) {
                 Log.i("Websocket", "Error " + e.message)
                 runOnUiThread {
+                    wsConnected = false
                     mprogresBar.visibility = View.INVISIBLE
                     menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect))
                     Toast.makeText(application, "Turntable not found", Toast.LENGTH_SHORT).show()
@@ -409,12 +451,6 @@ class MainActivity : AppCompatActivity() {
 
     private fun disconnectWebSocket() {
         mWebSocketClient?.close()
-    }
-
-    fun sendMessage(view: View) {
-        val editText = findViewById<View>(R.id.message) as EditText
-        mWebSocketClient!!.send(editText.text.toString())
-        editText.setText("")
     }
 
     inner class WifiScanReceiver: BroadcastReceiver() {
