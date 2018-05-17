@@ -11,6 +11,7 @@
     <string name="shooting_mode">Shooting mode</string>
     <string name="action_save">Save</string>
     <string name="preferences_saved">Preferences saved</string>
+    <string name="param1_label">Frames</string>
     <string-array name="shootingmode_array">
         <item>Interval</item>
         <item>Ping-Pong</item>

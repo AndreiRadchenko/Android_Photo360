@@ -21,6 +21,7 @@ import android.provider.Contacts
 import android.support.annotation.RequiresApi
 import android.support.annotation.UiThread
 import android.support.design.R.id.visible
+import android.support.design.widget.TabLayout
 import android.support.v4.view.ViewPager
 import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
@@ -100,12 +101,15 @@ class MainActivity : AppCompatActivity() {
         var displayMetrics: DisplayMetrics? = null
 
         // create fragments from 0 to 9
-        for (i in 0..4) {
+        for (i in 0..3) {
             pageAdapter.add(PageFragment.newInstance(i), "Tab$i")
         }
 
         mViewPager = findViewById(R.id.view_pager)
         mViewPager.adapter = pageAdapter
+
+        var tabLayout = findViewById(R.id.tabs) as TabLayout
+        tabLayout.setupWithViewPager(mViewPager)
 
         mprogresBar = findViewById(R.id.progressBar)
         btnRunCW = findViewById(R.id.button_run_cw)
@@ -199,13 +203,13 @@ class MainActivity : AppCompatActivity() {
     override fun onStop() {
         EventBus.getDefault().unregister(this)
         unregisterReceiver(wifiScanReceiver)
+        TurntableConectionJob.cancel()
         super.onStop()
         //disconnectWebSocket()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        TurntableConectionJob.cancel()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -245,8 +249,6 @@ class MainActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-
         when (item.itemId) {
             R.id.action_connect -> {
                 if (!wsConnected) {
@@ -408,14 +410,6 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread {
                     Log.d("onMessage()", PreferenceManager.FRAMES_LEFT + ": " + frameleft)
                     sharedPrefs?.framesLeft = frameleft
-
-//                    var currentFragment = pageAdapter.getItem(currentFragmentId)
-//                    if (currentFragment.isVisible) {
-//                        //var currentFragment = pageAdapter.getItem(currentFragmentId)
-//                        framesLeftTxt = currentFragment.view!!.findViewById(R.id.frames_left_txt)
-//                        framesLeftTxt.setText(frameleft.toString())
-//                        framesLeftTxt.invalidate()
-//                    }
                 }
             }
 

@@ -14,7 +14,9 @@
         android:layout_alignParentRight="false"
         android:layout_alignParentTop="true"
         android:layout_alignWithParentIfMissing="false"
-        android:layout_marginTop="?attr/actionBarSize">
+        android:layout_marginTop="?attr/actionBarSize"
+        android:paddingRight="15dp"
+        android:paddingTop="15dp">
 
         <TextView
             android:id="@+id/preset_name"
@@ -53,23 +55,158 @@
 
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/frames_left_txt"
+    <RelativeLayout
+        android:id="@+id/fragment_params_row1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/fragment_head"
+        android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
-        android:text="Hello"
-        android:textAlignment="center"
-        android:textSize="56sp"
-        android:typeface="monospace" />
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
 
-    <unidesign.photo360.TurntableView
-        android:id="@+id/turntable_view"
+        <RelativeLayout
+            android:id="@+id/preset_param1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/param1_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/param1_value"
+                android:text="@string/preset_frame"
+                android:textColor="@android:color/holo_orange_light"
+                tools:textColor="@android:color/holo_orange_light" />
+
+            <TextView
+                android:id="@+id/param1_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/param1_label"
+                android:paddingLeft="5dp"
+                android:text="24" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/preset_param2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/preset_param1"
+            android:gravity="right"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/param2_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/param2_value"
+                android:text="@string/preset_delay"
+                android:textColor="@android:color/holo_orange_light" />
+
+            <TextView
+                android:id="@+id/param2_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/param2_label"
+                android:paddingLeft="5dp"
+                android:text="300" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/fragment_params_row2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fragment_params_row1"
+        android:layout_centerInParent="false"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp">
+
+        <RelativeLayout
+            android:id="@+id/preset_param3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/param3_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/param1_value"
+                android:text="@string/preset_speed"
+                android:textColor="@android:color/holo_orange_light" />
+
+            <TextView
+                android:id="@+id/param3_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/param3_label"
+                android:paddingLeft="5dp"
+                android:text="3000" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/preset_param4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/preset_param3"
+            android:gravity="right"
+            android:padding="8dp">
+
+            <TextView
+                android:id="@+id/param4_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:labelFor="@+id/param4_value"
+                android:text="@string/preset_acceleration"
+                android:textColor="@android:color/holo_orange_light" />
+
+            <TextView
+                android:id="@+id/param4_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@+id/param4_label"
+                android:paddingLeft="5dp"
+                android:text="1000" />
+
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="24" />
+        android:id="@+id/fragment_turntable_view"
+        android:layout_below="@+id/fragment_params_row2">
 
+        <unidesign.photo360.TurntableView
+            android:id="@+id/turntable_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="24" />
+
+        <TextView
+            android:id="@+id/frames_left_txt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:layout_centerVertical="false"
+            android:layout_marginTop="56dp"
+            android:text="Hello"
+            android:textAlignment="center"
+            android:textSize="56sp"
+            android:typeface="monospace" />
+
+    </RelativeLayout>
 
 
 </RelativeLayout>
