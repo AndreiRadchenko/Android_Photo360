@@ -42,6 +42,15 @@ class SettingsPreferences(internal var _context: Context) {
             editor.commit()
         }
 
+    fun setChanges(presetNum: Int, settings: Settings){
+        when (presetNum){
+            0 -> preset1 = settings.getJSON().toString()
+            1 -> preset2 = settings.getJSON().toString()
+            2 -> preset3 = settings.getJSON().toString()
+            3 -> preset4 = settings.getJSON().toString()
+        }
+    }
+
     init {
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
         editor = pref.edit()

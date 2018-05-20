@@ -22,6 +22,7 @@ class PageFragment : Fragment() {
     lateinit var param3_txt: TextView
     lateinit var param4_txt: TextView
     var page: Int = 0
+    lateinit var viewModel: AppViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_page, container, false)
@@ -34,29 +35,60 @@ class PageFragment : Fragment() {
         param3_txt = view.findViewById(R.id.param3_value)
         param4_txt = view.findViewById(R.id.param4_value)
         val ivSettings: ImageView = view.findViewById(R.id.preset_settings)
-        ivSettings.setOnClickListener { startActivity(Intent("intent.action.presetedit")) }
 
-        var viewModel = ViewModelProviders.of(this).get(AppViewModel::class.java)
-        viewModel.getPreset1().observe(this, object: Observer<String> {
-                                                                override fun onChanged(jss: String?) {
-                                                                            var settings = Settings(jss!!)
-                                                                            preset_name_txt.text = settings.presetName
-                                                                }
-                                                            })
+        ivSettings.setOnClickListener {
+            var editIntent = Intent()
+            editIntent.action = "intent.action.presetedit"
+            editIntent.putExtra("page", page)
+            startActivity(editIntent)
+        }
 
+        viewModel = ViewModelProviders.of(this).get(AppViewModel::class.java)
+        when (page) {
+            0 -> viewModel.getPreset1().
+                    observe(this, object: Observer<String> {
+                        override fun onChanged(jss: String?) {
+                            var settings = Settings(jss!!)
+                            displaySettings(settings)
+                        }
+                    })
+            1 -> viewModel.getPreset2().
+                    observe(this, object: Observer<String> {
+                        override fun onChanged(jss: String?) {
+                            var settings = Settings(jss!!)
+                            displaySettings(settings)
+                        }
+                    })
+            2 -> viewModel.getPreset3().
+                    observe(this, object: Observer<String> {
+                        override fun onChanged(jss: String?) {
+                            var settings = Settings(jss!!)
+                            displaySettings(settings)
+                        }
+                    })
+            3 -> viewModel.getPreset4().
+                    observe(this, object: Observer<String> {
+                        override fun onChanged(jss: String?) {
+                            var settings = Settings(jss!!)
+                            displaySettings(settings)
+                        }
+                    })
+        }
+        //viewModel.initPreferencesRequest()
         return view
     }
 
     override fun onResume() {
+        viewModel.initPreferencesRequest()
         if (page == MainActivity.currentFragmentId){
-            var frames =  MainActivity.sharedPrefs?.framesLeft.toString()
-            Log.d("PageFragment onResume()", "frames number set to " + frames)
-            frames_txt?.text = frames
+            //var frames =  MainActivity.sharedPrefs?.framesLeft.toString()
+            //Log.d("PageFragment onResume()", "frames number set to " + frames)
+            //frames_txt?.text = frames
         }
         else {
-            var frames =  MainActivity.sharedPrefs?.frame.toString()
-            Log.d("PageFragment onResume()", "frames number set to " + frames)
-            frames_txt?.text = frames
+            //var frames =  MainActivity.sharedPrefs?.frame.toString()
+           // Log.d("PageFragment onResume()", "frames number set to " + frames)
+            //frames_txt?.text = frames
         }
         super.onResume()
     }
@@ -75,6 +107,14 @@ class PageFragment : Fragment() {
         }
     }
 
+    fun displaySettings (mSettings: Settings){
+        preset_name_txt.text = mSettings.presetName
+        param1_txt.text = mSettings.frame.toString()
+        param2_txt.text = mSettings.delay.toString()
+        param3_txt.text = mSettings.speed.toString()
+        param4_txt.text = mSettings.acceleration.toString()
+        frames_txt.text = mSettings.framesLeft.toString()
+    }
 //    fun fragmentObserver(jsString: String): Observer<String> {
 //        var settings = Settings(jsString)
 //        preset_name_txt.text = settings.presetName

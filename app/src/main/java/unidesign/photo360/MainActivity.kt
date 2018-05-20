@@ -53,6 +53,7 @@ import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
+    val NO_FRAGMENT_RUNNING = -1
     lateinit var mprogresBar: ProgressBar
 //    var networkSSID = "test"
 //    var networkPass = "pass"
@@ -71,6 +72,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var wifiScanReceiver: BroadcastReceiver
     //represents a common pool of shared threads as the coroutine dispatcher
     private val bgContext: CoroutineContext = CommonPool
+    private var runningFragmentId: Int = NO_FRAGMENT_RUNNING
     //public val sharedPrefs = PreferenceManager(applicationContext)
     //public val sharedPrefs = PreferenceManager(applicationContext)
     companion object {
@@ -118,43 +120,53 @@ class MainActivity : AppCompatActivity() {
         disableButton()
 
         btnRunCW.setOnClickListener(View.OnClickListener {
-            sharedPrefs?.direction = 1
-            sharedPrefs?.state = "start"
-
             currentFragmentId = mViewPager.currentItem
-            //var currentFragment = pageAdapter.getItem(currentFragmentId)
-            //framesLeftTxt = currentFragment.view!!.findViewById(R.id.frames_left_txt)
-
+            //runningFragmentId = mViewPager.currentItem
+            var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
+            var postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
+                                            Settings().getJSON().toString())
+            postSettings.direction = 1
+            postSettings.state = "start"
+//            sharedPrefs?.direction = 1
+//            sharedPrefs?.state = "start"
             try {
-                mWebSocketClient!!.send(sharedPrefs?.getJSON().toString())
+                mWebSocketClient!!.send(postSettings.getJSON().toString())
             }
             catch (e: Exception) {
                 Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
             }
         })
         btnRunCCW.setOnClickListener(View.OnClickListener {
-            sharedPrefs?.direction = 0
-            sharedPrefs?.state = "start"
-
             currentFragmentId = mViewPager.currentItem
-            //var currentFragment = pageAdapter.getItem(currentFragmentId)
-            //framesLeftTxt = currentFragment.view!!.findViewById(R.id.frames_left_txt)
-
+            //runningFragmentId = mViewPager.currentItem
+            var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
+            var postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
+                                            Settings().getJSON().toString())
+            postSettings.direction = 0
+            postSettings.state = "start"
+//            sharedPrefs?.direction = 0
+//            sharedPrefs?.state = "start"
             try {
-                mWebSocketClient!!.send(sharedPrefs?.getJSON().toString())
+                mWebSocketClient!!.send(postSettings.getJSON().toString())
             }
             catch (e: Exception) {
                 Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
             }
         })
         btnSTOP.setOnClickListener(View.OnClickListener {
-            sharedPrefs?.state = "stop"
+            //sharedPrefs?.state = "stop"
+            currentFragmentId = mViewPager.currentItem
+            var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
+            var postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
+                                            Settings().getJSON().toString())
+            postSettings.state = "stop"
             try {
-                mWebSocketClient!!.send(sharedPrefs?.getJSON().toString())
+                mWebSocketClient!!.send(postSettings.getJSON().toString())
             }
             catch (e: Exception) {
                 Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
             }
+            runningFragmentId = NO_FRAGMENT_RUNNING
         })
 
     }
@@ -206,6 +218,11 @@ class MainActivity : AppCompatActivity() {
         TurntableConectionJob.cancel()
         super.onStop()
         //disconnectWebSocket()
+    }
+
+    override fun onPause() {
+        currentFragmentId = mViewPager.currentItem
+        super.onPause()
     }
 
     override fun onDestroy() {

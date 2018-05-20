@@ -1,5 +1,7 @@
 package unidesign.photo360
 
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.ContentValues
 import android.os.Build
 import android.os.Bundle
@@ -25,7 +27,11 @@ class PresetEdit : AppCompatActivity() {
     lateinit var etSpeed: EditText
     lateinit var etAcceleration: EditText
     lateinit var etShootingMode: Spinner
-    lateinit var sharedPrefs: PreferenceManager
+    //lateinit var sharedPrefs: PreferenceManager
+    lateinit var settingsPrefs: SettingsPreferences
+    lateinit var viewModel: AppViewModel
+    lateinit var oldSet: Settings
+    var page: Int = 0
 
     enum class ShootingMode {
         inter, PingP, seria, nonST
@@ -37,7 +43,12 @@ class PresetEdit : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.preset_edit)
-        sharedPrefs = PreferenceManager(applicationContext)
+
+        // Get the Intent that started this activity and extract the fragment number
+        page = intent.getIntExtra("page", 0)
+
+        //sharedPrefs = PreferenceManager(applicationContext)
+        settingsPrefs = SettingsPreferences(applicationContext)
         val myToolbar = findViewById<View>(R.id.preset_edit_toolbar) as Toolbar
         setSupportActionBar(myToolbar)
         // Get a support ActionBar corresponding to this toolbar
@@ -61,13 +72,37 @@ class PresetEdit : AppCompatActivity() {
         // Apply the adapter to the spinner
         etShootingMode.adapter = adapter
 
-        etName.setText(sharedPrefs.presetName);
-        etFrame.setText(sharedPrefs.frame.toString())
-        etDelay.setText(sharedPrefs.delay.toString())
-        etSpeed.setText(sharedPrefs.speed.toString())
-        etAcceleration.setText(sharedPrefs.acceleration.toString())
-        etShootingMode.setSelection( shootingModemap.get(sharedPrefs.shootingMode)!!)
-        //= sharedPrefs.shootingMode
+        viewModel = ViewModelProviders.of(this).get(AppViewModel::class.java)
+        when (page) {
+            0 -> viewModel.getPreset1().
+                    observe(this, object: Observer<String> {
+                        override fun onChanged(jss: String?) {
+                            var settings = Settings(jss!!)
+                            displaySettings(settings)
+                        }
+                    })
+            1 -> viewModel.getPreset2().
+                    observe(this, object: Observer<String> {
+                        override fun onChanged(jss: String?) {
+                            var settings = Settings(jss!!)
+                            displaySettings(settings)
+                        }
+                    })
+            2 -> viewModel.getPreset3().
+                    observe(this, object: Observer<String> {
+                        override fun onChanged(jss: String?) {
+                            var settings = Settings(jss!!)
+                            displaySettings(settings)
+                        }
+                    })
+            3 -> viewModel.getPreset4().
+                    observe(this, object: Observer<String> {
+                        override fun onChanged(jss: String?) {
+                            var settings = Settings(jss!!)
+                            displaySettings(settings)
+                        }
+                    })
+        }
 
         etShootingMode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View,
@@ -89,9 +124,19 @@ class PresetEdit : AppCompatActivity() {
                 // TODO Auto-generated method stub
             }
         }
-        // создаем объект для создания и управления версиями БД
-        //dbHelper = new TemplatesDataSource(this);
 
+        viewModel.initPreferencesRequest()
+    }
+
+    fun displaySettings (mSettings: Settings){
+
+        etName.setText(mSettings.presetName)
+        etFrame.setText(mSettings.frame.toString())
+        etDelay.setText(mSettings.delay.toString())
+        etSpeed.setText(mSettings.speed.toString())
+        etAcceleration.setText(mSettings.acceleration.toString())
+        etShootingMode.setSelection( shootingModemap.get(mSettings.shootingMode)!!)
+        //= sharedPrefs.shootingMode
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -104,25 +149,30 @@ class PresetEdit : AppCompatActivity() {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-
-        // создаем объект для данных
-        val values = ContentValues()
-
-        //получаем данные из полей ввода
-        //String name = etName.getText().toString();
-        //String comment = etComment.getText().toString();
-        //String template = etTemplate.getText().toString();
-
         when (item.itemId) {
             R.id.action_save -> {
-                sharedPrefs.presetName = etName.text.toString()
-                sharedPrefs.frame = etFrame.text.toString().toInt()
-                sharedPrefs.framesLeft = etFrame.text.toString().toInt()
-                sharedPrefs.delay = etDelay.text.toString().toInt()
-                sharedPrefs.speed = etSpeed.text.toString().toInt()
-                sharedPrefs.acceleration = etAcceleration.text.toString().toInt()
-                sharedPrefs.shootingMode = getKeyByValue(shootingModemap, etShootingMode.selectedItemPosition) ?: "inter"
-                Log.d("action_save", sharedPrefs.shootingMode)
+                when (page) {
+                    0 -> oldSet = Settings(viewModel.getPreset1().value!!)
+                    1 -> oldSet = Settings(viewModel.getPreset2().value!!)
+                    2 -> oldSet = Settings(viewModel.getPreset3().value!!)
+                    3 -> oldSet = Settings(viewModel.getPreset4().value!!)
+                }
+                oldSet.presetName = etName.text.toString()
+                oldSet.frame = etFrame.text.toString().toInt()
+                oldSet.framesLeft = etFrame.text.toString().toInt()
+                oldSet.delay = etDelay.text.toString().toInt()
+                oldSet.speed = etSpeed.text.toString().toInt()
+                oldSet.acceleration = etAcceleration.text.toString().toInt()
+                oldSet.shootingMode = getKeyByValue(shootingModemap, etShootingMode.selectedItemPosition) ?: "inter"
+                settingsPrefs.setChanges(page, oldSet)
+//                sharedPrefs.presetName = etName.text.toString()
+//                sharedPrefs.frame = etFrame.text.toString().toInt()
+//                sharedPrefs.framesLeft = etFrame.text.toString().toInt()
+//                sharedPrefs.delay = etDelay.text.toString().toInt()
+//                sharedPrefs.speed = etSpeed.text.toString().toInt()
+//                sharedPrefs.acceleration = etAcceleration.text.toString().toInt()
+//                sharedPrefs.shootingMode = getKeyByValue(shootingModemap, etShootingMode.selectedItemPosition) ?: "inter"
+//                Log.d("action_save", sharedPrefs.shootingMode)
                 Toast.makeText(applicationContext, R.string.preferences_saved, Toast.LENGTH_LONG).show()
                 finish()
                 return true

@@ -22,6 +22,16 @@ class AppViewModel(var app: Application) : AndroidViewModel( app) {
         json_string_preset4.value = pref.preset4
     }
 
+    fun getPreset(page: Int): LiveData<String> {
+        return when (page){
+            0 -> json_string_preset1
+            1 -> json_string_preset2
+            2 -> json_string_preset3
+            3 -> json_string_preset4
+            else -> json_string_preset1
+        }
+    }
+
     fun getPreset1(): LiveData<String> {
         return json_string_preset1
     }
