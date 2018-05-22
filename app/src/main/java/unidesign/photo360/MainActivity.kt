@@ -73,6 +73,7 @@ class MainActivity : AppCompatActivity() {
     //represents a common pool of shared threads as the coroutine dispatcher
     private val bgContext: CoroutineContext = CommonPool
     private var runningFragmentId: Int = NO_FRAGMENT_RUNNING
+    var postSettings: Settings = Settings()
     //public val sharedPrefs = PreferenceManager(applicationContext)
     //public val sharedPrefs = PreferenceManager(applicationContext)
     companion object {
@@ -123,10 +124,11 @@ class MainActivity : AppCompatActivity() {
             currentFragmentId = mViewPager.currentItem
             //runningFragmentId = mViewPager.currentItem
             var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
-            var postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
+            postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
                                             Settings().getJSON().toString())
             postSettings.direction = 1
             postSettings.state = "start"
+            buttonStopState()
 //            sharedPrefs?.direction = 1
 //            sharedPrefs?.state = "start"
             try {
@@ -134,16 +136,18 @@ class MainActivity : AppCompatActivity() {
             }
             catch (e: Exception) {
                 Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
+                buttonStartState()
             }
         })
         btnRunCCW.setOnClickListener(View.OnClickListener {
             currentFragmentId = mViewPager.currentItem
             //runningFragmentId = mViewPager.currentItem
             var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
-            var postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
+            postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
                                             Settings().getJSON().toString())
             postSettings.direction = 0
             postSettings.state = "start"
+            buttonStopState()
 //            sharedPrefs?.direction = 0
 //            sharedPrefs?.state = "start"
             try {
@@ -151,15 +155,17 @@ class MainActivity : AppCompatActivity() {
             }
             catch (e: Exception) {
                 Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
+                buttonStartState()
             }
         })
         btnSTOP.setOnClickListener(View.OnClickListener {
             //sharedPrefs?.state = "stop"
-            currentFragmentId = mViewPager.currentItem
-            var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
-            var postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
-                                            Settings().getJSON().toString())
+            //currentFragmentId = mViewPager.currentItem
+            //var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
+            //postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
+            //                                Settings().getJSON().toString())
             postSettings.state = "stop"
+            buttonStartState()
             try {
                 mWebSocketClient!!.send(postSettings.getJSON().toString())
             }
@@ -189,7 +195,10 @@ class MainActivity : AppCompatActivity() {
 
         if (wsConnected)
         {
-            enableButton()
+            if (postSettings.state == "waiting")
+                 buttonStartState()
+            else buttonStopState()
+            //enableButton()
             menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected))
         }
         mViewPager.currentItem = currentFragmentId
@@ -252,6 +261,20 @@ class MainActivity : AppCompatActivity() {
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         btnRunCW.isEnabled = true
         btnRunCCW.isEnabled = true
+        btnSTOP.isEnabled = true
+    }
+
+    private fun buttonStartState() {
+        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        btnRunCW.isEnabled = true
+        btnRunCCW.isEnabled = true
+        btnSTOP.isEnabled = false
+    }
+
+    private fun buttonStopState() {
+        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        btnRunCW.isEnabled = false
+        btnRunCCW.isEnabled = false
         btnSTOP.isEnabled = true
     }
 
@@ -416,7 +439,7 @@ class MainActivity : AppCompatActivity() {
                     menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected))
                     mprogresBar.visibility = View.INVISIBLE
                     Toast.makeText(application, "Turntable connected", Toast.LENGTH_SHORT).show()
-                    enableButton()
+                    buttonStartState()
                 }
             }
 
