@@ -9,6 +9,7 @@ class Settings() {
 
     companion object {
 
+        //private val PRESET_FRAGMENT = "presetFragment"
         private val PRESET_NAME = "presetName"
         private val FIRMWARE_VERSION = "firmwareVersion"
         private val WIFI_SSID = "wifiSsid"
@@ -25,6 +26,8 @@ class Settings() {
         private val SHOOTING_MODE = "shootingMode"
         private val DIRECTION = "direction"
     }
+
+    //var presetFragment: Int
 
     var presetName: String
 
@@ -59,6 +62,7 @@ class Settings() {
     fun getJSON(): JSONObject {
         val rjsonObject = JSONObject()
         try {
+            //rjsonObject.put(PRESET_FRAGMENT, this.presetFragment)
             rjsonObject.put(PRESET_NAME, this.presetName)
             rjsonObject.put(FIRMWARE_VERSION, this.firmwareVersion)
             rjsonObject.put(WIFI_SSID, this.wifiSsid)
@@ -81,6 +85,7 @@ class Settings() {
     }
 
     init {
+        //presetFragment = 0
         presetName = "Preset 1"
         firmwareVersion= "PhotoPizza AP"
         wifiSsid = "Photo360"
@@ -101,6 +106,7 @@ class Settings() {
     constructor(initJsonString: String) : this(){
         var initJsonObj = JSONObject(initJsonString)
 
+        //presetFragment = initJsonObj.getInt(PRESET_FRAGMENT)
         presetName = initJsonObj.getString(PRESET_NAME)
         firmwareVersion = initJsonObj.getString(FIRMWARE_VERSION)
         wifiSsid = initJsonObj.getString(WIFI_SSID)

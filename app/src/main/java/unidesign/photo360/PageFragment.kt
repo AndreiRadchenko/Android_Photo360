@@ -5,11 +5,9 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.ViewGroup
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 
@@ -22,7 +20,7 @@ class PageFragment : Fragment() {
     lateinit var param3_txt: TextView
     lateinit var param4_txt: TextView
     var page: Int = 0
-    lateinit var viewModel: AppViewModel
+    lateinit var viewModel: FragmentViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_page, container, false)
@@ -43,8 +41,17 @@ class PageFragment : Fragment() {
             startActivity(editIntent)
         }
 
-        viewModel = ViewModelProviders.of(this).get(AppViewModel::class.java)
-        when (page) {
+        viewModel = ViewModelProviders.of(this).get(FragmentViewModel::class.java)
+
+        viewModel.getPreset(page).
+                observe(this, object: Observer<String> {
+                    override fun onChanged(jss: String?) {
+                        var settings = Settings(jss!!)
+                        displaySettings(settings)
+                    }
+                })
+
+/*        when (page) {
             0 -> viewModel.getPreset1().
                     observe(this, object: Observer<String> {
                         override fun onChanged(jss: String?) {
@@ -73,13 +80,13 @@ class PageFragment : Fragment() {
                             displaySettings(settings)
                         }
                     })
-        }
+        }*/
         //viewModel.initPreferencesRequest()
         return view
     }
 
     override fun onResume() {
-        viewModel.initPreferencesRequest()
+        viewModel.initPreferencesRequest(page)
         if (page == MainActivity.currentFragmentId){
             //var frames =  MainActivity.sharedPrefs?.framesLeft.toString()
             //Log.d("PageFragment onResume()", "frames number set to " + frames)

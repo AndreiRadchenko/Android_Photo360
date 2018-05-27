@@ -2,7 +2,6 @@ package unidesign.photo360
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.content.ContentValues
 import android.os.Build
 import android.os.Bundle
 import android.support.annotation.RequiresApi
@@ -29,7 +28,7 @@ class PresetEdit : AppCompatActivity() {
     lateinit var etShootingMode: Spinner
     //lateinit var sharedPrefs: PreferenceManager
     lateinit var settingsPrefs: SettingsPreferences
-    lateinit var viewModel: AppViewModel
+    lateinit var viewModel: FragmentViewModel
     lateinit var oldSet: Settings
     var page: Int = 0
 
@@ -72,8 +71,17 @@ class PresetEdit : AppCompatActivity() {
         // Apply the adapter to the spinner
         etShootingMode.adapter = adapter
 
-        viewModel = ViewModelProviders.of(this).get(AppViewModel::class.java)
-        when (page) {
+        viewModel = ViewModelProviders.of(this).get(FragmentViewModel::class.java)
+
+        viewModel.getPreset(page).
+                observe(this, object: Observer<String> {
+                    override fun onChanged(jss: String?) {
+                        var settings = Settings(jss!!)
+                        displaySettings(settings)
+                    }
+                })
+
+/*        when (page) {
             0 -> viewModel.getPreset1().
                     observe(this, object: Observer<String> {
                         override fun onChanged(jss: String?) {
@@ -102,7 +110,7 @@ class PresetEdit : AppCompatActivity() {
                             displaySettings(settings)
                         }
                     })
-        }
+        }*/
 
         etShootingMode.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View,
@@ -125,7 +133,7 @@ class PresetEdit : AppCompatActivity() {
             }
         }
 
-        viewModel.initPreferencesRequest()
+        viewModel.initPreferencesRequest(page)
     }
 
     fun displaySettings (mSettings: Settings){
@@ -151,12 +159,13 @@ class PresetEdit : AppCompatActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
             R.id.action_save -> {
-                when (page) {
+                oldSet = Settings(viewModel.getPreset(page).value!!)
+/*                when (page) {
                     0 -> oldSet = Settings(viewModel.getPreset1().value!!)
                     1 -> oldSet = Settings(viewModel.getPreset2().value!!)
                     2 -> oldSet = Settings(viewModel.getPreset3().value!!)
                     3 -> oldSet = Settings(viewModel.getPreset4().value!!)
-                }
+                }*/
                 oldSet.presetName = etName.text.toString()
                 oldSet.frame = etFrame.text.toString().toInt()
                 oldSet.framesLeft = etFrame.text.toString().toInt()
@@ -165,14 +174,7 @@ class PresetEdit : AppCompatActivity() {
                 oldSet.acceleration = etAcceleration.text.toString().toInt()
                 oldSet.shootingMode = getKeyByValue(shootingModemap, etShootingMode.selectedItemPosition) ?: "inter"
                 settingsPrefs.setChanges(page, oldSet)
-//                sharedPrefs.presetName = etName.text.toString()
-//                sharedPrefs.frame = etFrame.text.toString().toInt()
-//                sharedPrefs.framesLeft = etFrame.text.toString().toInt()
-//                sharedPrefs.delay = etDelay.text.toString().toInt()
-//                sharedPrefs.speed = etSpeed.text.toString().toInt()
-//                sharedPrefs.acceleration = etAcceleration.text.toString().toInt()
-//                sharedPrefs.shootingMode = getKeyByValue(shootingModemap, etShootingMode.selectedItemPosition) ?: "inter"
-//                Log.d("action_save", sharedPrefs.shootingMode)
+
                 Toast.makeText(applicationContext, R.string.preferences_saved, Toast.LENGTH_LONG).show()
                 finish()
                 return true

@@ -2,6 +2,8 @@ package unidesign.photo360
 
 import android.Manifest
 import android.app.ProgressDialog
+import android.arch.lifecycle.Observer
+import android.arch.lifecycle.ViewModelProviders
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -48,6 +50,7 @@ import kotlinx.coroutines.experimental.android.UI
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import unidesign.photo360.R.drawable.settings
 import java.util.concurrent.TimeUnit
 
 
@@ -77,7 +80,7 @@ class MainActivity : AppCompatActivity() {
     //public val sharedPrefs = PreferenceManager(applicationContext)
     //public val sharedPrefs = PreferenceManager(applicationContext)
     companion object {
-        var sharedPrefs: PreferenceManager? = null
+        //var sharedPrefs: PreferenceManager? = null
         var currentFragmentId: Int = 0
         lateinit var wifiManager: WifiManager
         var fireWiFiScan = false
@@ -86,12 +89,14 @@ class MainActivity : AppCompatActivity() {
         var menu: Menu? = null
     }
 
+    lateinit var viewModel: ActivityViewModel
+
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        sharedPrefs = PreferenceManager(applicationContext)
+        //sharedPrefs = PreferenceManager(applicationContext)
         wifiConf =  WifiConfiguration()
         wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
@@ -120,15 +125,40 @@ class MainActivity : AppCompatActivity() {
         btnSTOP = findViewById(R.id.button_stop)
         disableButton()
 
+        viewModel = ViewModelProviders.of(this).get(ActivityViewModel::class.java)
+
+        viewModel.getSettings().
+                observe(this, Observer<Settings> { set -> run {
+                    Log.d("App ViewModel Observ", "set?.state = " + set?.state)
+                    if (set?.state == "waiting" || set?.state == "stop")
+                        buttonStartState()
+                    else
+                        buttonStopState()}
+                })
+
+/*        viewModel.isTtRun().
+                observe(this, object: Observer<Boolean> {
+                    override fun onChanged(isRun: Boolean?) {
+                        if (isRun!!)
+                            buttonStopState()
+                        else
+                            buttonStartState()
+                    }
+                })*/
+
         btnRunCW.setOnClickListener(View.OnClickListener {
             currentFragmentId = mViewPager.currentItem
             //runningFragmentId = mViewPager.currentItem
             var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
             postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
                                             Settings().getJSON().toString())
+
             postSettings.direction = 1
             postSettings.state = "start"
-            buttonStopState()
+            //postSettings.presetFragment = currentFragmentId
+            viewModel.setSettings(postSettings)
+            //viewModel.setTtRun(true)
+//            buttonStopState()
 //            sharedPrefs?.direction = 1
 //            sharedPrefs?.state = "start"
             try {
@@ -147,7 +177,9 @@ class MainActivity : AppCompatActivity() {
                                             Settings().getJSON().toString())
             postSettings.direction = 0
             postSettings.state = "start"
-            buttonStopState()
+            viewModel.setSettings(postSettings)
+            //viewModel.setTtRun(true)
+//            buttonStopState()
 //            sharedPrefs?.direction = 0
 //            sharedPrefs?.state = "start"
             try {
@@ -165,7 +197,9 @@ class MainActivity : AppCompatActivity() {
             //postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
             //                                Settings().getJSON().toString())
             postSettings.state = "stop"
-            buttonStartState()
+            viewModel.setSettings(postSettings)
+            //viewModel.setTtRun(false)
+            //buttonStartState()
             try {
                 mWebSocketClient!!.send(postSettings.getJSON().toString())
             }
@@ -195,9 +229,9 @@ class MainActivity : AppCompatActivity() {
 
         if (wsConnected)
         {
-            if (postSettings.state == "waiting")
+/*            if (postSettings.state == "waiting")
                  buttonStartState()
-            else buttonStopState()
+            else buttonStopState()*/
             //enableButton()
             menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected))
         }
@@ -214,7 +248,7 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onStart() {
         super.onStart()
-        EventBus.getDefault().register(this)
+        //EventBus.getDefault().register(this)
         TurntableConectionJob = Job()
         wifiScanReceiver = WifiScanReceiver()
         registerReceiver(wifiScanReceiver, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
@@ -222,7 +256,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        EventBus.getDefault().unregister(this)
+        //EventBus.getDefault().unregister(this)
         unregisterReceiver(wifiScanReceiver)
         TurntableConectionJob.cancel()
         super.onStop()
@@ -238,17 +272,18 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
+/*    @Subscribe(threadMode = ThreadMode.MAIN)
     public fun onMessage(event: wsMessage){
-        var currentFragment = pageAdapter.getItem(currentFragmentId)
+        var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
         if (currentFragment.isVisible) {
             //var currentFragment = pageAdapter.getItem(currentFragmentId)
+
             framesLeftTxt = currentFragment.view!!.findViewById(R.id.frames_left_txt)
-            framesLeftTxt.setText(event.message)
+            framesLeftTxt.setText(event.framesLeft)
             framesLeftTxt.invalidate()
         }
     //mytextview.setText(event.message);
-    }
+    }*/
 
     private fun disableButton() {
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
@@ -331,7 +366,7 @@ class MainActivity : AppCompatActivity() {
     fun connect2Turntable(){
         TurntableConectionJob = launch(UI){
             try {
-                val result1 = withContext(bgContext) { connect2Photo360WiFi(sharedPrefs?.wifiSsid, sharedPrefs?.wifiPassword) }
+                val result1 = withContext(bgContext) { connect2Photo360WiFi( postSettings.wifiSsid, postSettings.wifiPassword) }
 
                 when (result1){
                     "wifi connected" -> {
@@ -445,11 +480,12 @@ class MainActivity : AppCompatActivity() {
 
             override fun onMessage(s: String) {
                 var esp32answer = JSONObject(s)
-                var frameleft = esp32answer.getInt(PreferenceManager.FRAMES_LEFT)
-                EventBus.getDefault().post(wsMessage(frameleft.toString()))
+                var frameleft = esp32answer.getInt(Settings.FRAMES_LEFT)
+                var state = esp32answer.getString(Settings.STATE)
+                EventBus.getDefault().post(wsMessage(frameleft, state))
                 runOnUiThread {
-                    Log.d("onMessage()", PreferenceManager.FRAMES_LEFT + ": " + frameleft)
-                    sharedPrefs?.framesLeft = frameleft
+                    Log.d("onMessage()", Settings.FRAMES_LEFT + ": " + frameleft)
+                    //sharedPrefs?.framesLeft = frameleft
                 }
             }
 
@@ -496,7 +532,7 @@ class MainActivity : AppCompatActivity() {
                 var TurntableFound = false
                 for (i:ScanResult in scanResults){
                     Log.d("WifiScanReceiver", "ScanResult: " + i.SSID)
-                    if (i.SSID.equals(sharedPrefs?.wifiSsid)) {
+                    if (i.SSID.equals(postSettings.wifiSsid)) {
                         connect2Turntable()
                         TurntableFound = true
                         break

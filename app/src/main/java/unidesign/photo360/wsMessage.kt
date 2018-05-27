@@ -1,3 +1,3 @@
 package unidesign.photo360
 
-class wsMessage(val message: String)
+class wsMessage(val framesLeft: Int, val state: String)
