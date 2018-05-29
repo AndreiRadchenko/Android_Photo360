@@ -56,7 +56,7 @@ import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
 
-    val NO_FRAGMENT_RUNNING = -1
+
     lateinit var mprogresBar: ProgressBar
 //    var networkSSID = "test"
 //    var networkPass = "pass"
@@ -75,18 +75,24 @@ class MainActivity : AppCompatActivity() {
     private lateinit var wifiScanReceiver: BroadcastReceiver
     //represents a common pool of shared threads as the coroutine dispatcher
     private val bgContext: CoroutineContext = CommonPool
-    private var runningFragmentId: Int = NO_FRAGMENT_RUNNING
-    var postSettings: Settings = Settings()
+    //private var runningFragmentId: Int = NO_FRAGMENT_RUNNING
+    //var postSettings: Settings = Settings()
     //public val sharedPrefs = PreferenceManager(applicationContext)
     //public val sharedPrefs = PreferenceManager(applicationContext)
     companion object {
         //var sharedPrefs: PreferenceManager? = null
+        val NO_FRAGMENT_RUNNING = -1
         var currentFragmentId: Int = 0
+        var runningFragmentId: Int = NO_FRAGMENT_RUNNING
+        var mstate: String = "waiting"
+        var mframeleft: Int = 36
+        var postSettings: Settings = Settings()
         lateinit var wifiManager: WifiManager
         var fireWiFiScan = false
         var wsConnected = false
         var mWebSocketClient: WebSocketClient? = null
         var menu: Menu? = null
+
     }
 
     lateinit var viewModel: ActivityViewModel
@@ -136,27 +142,19 @@ class MainActivity : AppCompatActivity() {
                         buttonStopState()}
                 })
 
-/*        viewModel.isTtRun().
-                observe(this, object: Observer<Boolean> {
-                    override fun onChanged(isRun: Boolean?) {
-                        if (isRun!!)
-                            buttonStopState()
-                        else
-                            buttonStartState()
-                    }
-                })*/
-
         btnRunCW.setOnClickListener(View.OnClickListener {
-            currentFragmentId = mViewPager.currentItem
+            runningFragmentId = mViewPager.currentItem
+            Log.d("OnClickListener()", "runningFragmentId: " + runningFragmentId)
             //runningFragmentId = mViewPager.currentItem
-            var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
-            postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
+            var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
+            postSettings = Settings(currentFragment.viewModel.getPreset(runningFragmentId).value ?:
                                             Settings().getJSON().toString())
 
             postSettings.direction = 1
             postSettings.state = "start"
             //postSettings.presetFragment = currentFragmentId
             viewModel.setSettings(postSettings)
+            //viewModel.setRunningFragment(currentFragmentId)
             //viewModel.setTtRun(true)
 //            buttonStopState()
 //            sharedPrefs?.direction = 1
@@ -170,10 +168,10 @@ class MainActivity : AppCompatActivity() {
             }
         })
         btnRunCCW.setOnClickListener(View.OnClickListener {
-            currentFragmentId = mViewPager.currentItem
+            runningFragmentId = mViewPager.currentItem
             //runningFragmentId = mViewPager.currentItem
-            var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
-            postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
+            var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
+            postSettings = Settings(currentFragment.viewModel.getPreset(runningFragmentId).value ?:
                                             Settings().getJSON().toString())
             postSettings.direction = 0
             postSettings.state = "start"
@@ -206,36 +204,55 @@ class MainActivity : AppCompatActivity() {
             catch (e: Exception) {
                 Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
             }
-            runningFragmentId = NO_FRAGMENT_RUNNING
+//            runningFragmentId = NO_FRAGMENT_RUNNING
         })
 
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public fun onMessage(event: wsMessage){
+/*
+        Log.d("AcViewModel onMessage()", Settings.FRAMES_LEFT + ": " + postSettings.value?.framesLeft)
+        Log.d("AcViewModel onMessage()", Settings.STATE + ": " + postSettings.value?.state)
+*/
+        postSettings.framesLeft = event.framesLeft
+        postSettings.state = event.state
+        viewModel.setSettings(postSettings)
+    }
 
-    override fun onSaveInstanceState(savedInstanceState: Bundle)
+/*    override fun onSaveInstanceState(savedInstanceState: Bundle)
     {
         super.onSaveInstanceState(savedInstanceState)
         savedInstanceState.putInt("FragmentId", currentFragmentId)
+        savedInstanceState.putInt("runFragmentId", runningFragmentId)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle)
     {
         super.onRestoreInstanceState(savedInstanceState)
         currentFragmentId = savedInstanceState.getInt("FragmentId")
-    }
+        runningFragmentId = savedInstanceState.getInt("runFragmentId")
+        Log.d("onRestoreInstanceState", "runningFragmentId: " + runningFragmentId)
+        Log.d("onRestoreInstanceState", "currentFragmentId: " + currentFragmentId)
+
+    }*/
 
     override fun onResume() {
         super.onResume()
 
         if (wsConnected)
         {
-/*            if (postSettings.state == "waiting")
-                 buttonStartState()
-            else buttonStopState()*/
-            //enableButton()
             menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected))
+            viewModel.setSettings(postSettings)
         }
-        mViewPager.currentItem = currentFragmentId
+
+        if (runningFragmentId == NO_FRAGMENT_RUNNING)
+            mViewPager.currentItem = currentFragmentId
+        else
+/*        Log.d("onResume()", "runningFragmentId: " + runningFragmentId)
+        Log.d("onResume()", "currentFragmentId: " + currentFragmentId)*/
+            mViewPager.currentItem = runningFragmentId
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
             if(checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
@@ -248,7 +265,7 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onStart() {
         super.onStart()
-        //EventBus.getDefault().register(this)
+        EventBus.getDefault().register(this)
         TurntableConectionJob = Job()
         wifiScanReceiver = WifiScanReceiver()
         registerReceiver(wifiScanReceiver, IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION))
@@ -256,7 +273,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onStop() {
-        //EventBus.getDefault().unregister(this)
+        EventBus.getDefault().unregister(this)
         unregisterReceiver(wifiScanReceiver)
         TurntableConectionJob.cancel()
         super.onStop()
@@ -265,6 +282,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onPause() {
         currentFragmentId = mViewPager.currentItem
+        //runningFragmentId = mViewPager.currentItem
         super.onPause()
     }
 
@@ -304,6 +322,7 @@ class MainActivity : AppCompatActivity() {
         btnRunCW.isEnabled = true
         btnRunCCW.isEnabled = true
         btnSTOP.isEnabled = false
+        runningFragmentId = NO_FRAGMENT_RUNNING
     }
 
     private fun buttonStopState() {
@@ -311,6 +330,7 @@ class MainActivity : AppCompatActivity() {
         btnRunCW.isEnabled = false
         btnRunCCW.isEnabled = false
         btnSTOP.isEnabled = true
+        //runningFragmentId = NO_FRAGMENT_RUNNING
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -485,6 +505,13 @@ class MainActivity : AppCompatActivity() {
                 EventBus.getDefault().post(wsMessage(frameleft, state))
                 runOnUiThread {
                     Log.d("onMessage()", Settings.FRAMES_LEFT + ": " + frameleft)
+                    MainActivity.postSettings.state = state
+                    MainActivity.postSettings.framesLeft = frameleft
+
+                    var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
+                    if (currentFragment != null) {
+                        currentFragment.viewModel.setChanges2View(runningFragmentId, wsMessage(frameleft, state))
+                    }
                     //sharedPrefs?.framesLeft = frameleft
                 }
             }

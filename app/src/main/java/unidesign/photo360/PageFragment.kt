@@ -50,38 +50,6 @@ class PageFragment : Fragment() {
                         displaySettings(settings)
                     }
                 })
-
-/*        when (page) {
-            0 -> viewModel.getPreset1().
-                    observe(this, object: Observer<String> {
-                        override fun onChanged(jss: String?) {
-                            var settings = Settings(jss!!)
-                            displaySettings(settings)
-                        }
-                    })
-            1 -> viewModel.getPreset2().
-                    observe(this, object: Observer<String> {
-                        override fun onChanged(jss: String?) {
-                            var settings = Settings(jss!!)
-                            displaySettings(settings)
-                        }
-                    })
-            2 -> viewModel.getPreset3().
-                    observe(this, object: Observer<String> {
-                        override fun onChanged(jss: String?) {
-                            var settings = Settings(jss!!)
-                            displaySettings(settings)
-                        }
-                    })
-            3 -> viewModel.getPreset4().
-                    observe(this, object: Observer<String> {
-                        override fun onChanged(jss: String?) {
-                            var settings = Settings(jss!!)
-                            displaySettings(settings)
-                        }
-                    })
-        }*/
-        //viewModel.initPreferencesRequest()
         return view
     }
 
