@@ -194,7 +194,11 @@ class MainActivity : AppCompatActivity() {
             //var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
             //postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
             //                                Settings().getJSON().toString())
+            var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
+            if (currentFragment != null)
+                currentFragment.viewModel.initPreferencesRequest(runningFragmentId)
             postSettings.state = "stop"
+            //postSettings.framesLeft = postSettings.frame
             viewModel.setSettings(postSettings)
             //viewModel.setTtRun(false)
             //buttonStartState()
@@ -508,10 +512,10 @@ class MainActivity : AppCompatActivity() {
                     MainActivity.postSettings.state = state
                     MainActivity.postSettings.framesLeft = frameleft
 
-                    var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
+/*                    var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
                     if (currentFragment != null) {
                         currentFragment.viewModel.setChanges2View(runningFragmentId, wsMessage(frameleft, state))
-                    }
+                    }*/
                     //sharedPrefs?.framesLeft = frameleft
                 }
             }

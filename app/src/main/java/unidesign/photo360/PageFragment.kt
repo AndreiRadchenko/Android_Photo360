@@ -10,6 +10,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
+import org.greenrobot.eventbus.ThreadMode
 
 class PageFragment : Fragment() {
 
@@ -53,8 +56,21 @@ class PageFragment : Fragment() {
         return view
     }
 
+    override fun onStart(){
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onStop(){
+        super.onStop()
+        EventBus.getDefault().unregister(this)
+    }
+
     override fun onResume() {
         viewModel.initPreferencesRequest(page)
+        if (page == MainActivity.runningFragmentId)
+            viewModel.setChanges2View(page, MainActivity.postSettings.framesLeft)
+
         if (page == MainActivity.currentFragmentId){
             //var frames =  MainActivity.sharedPrefs?.framesLeft.toString()
             //Log.d("PageFragment onResume()", "frames number set to " + frames)
@@ -66,6 +82,13 @@ class PageFragment : Fragment() {
             //frames_txt?.text = frames
         }
         super.onResume()
+    }
+
+    override fun onPause() {
+        //MainActivity.currentFragmentId = mViewPager.currentItem
+        //runningFragmentId = mViewPager.currentItem
+
+        super.onPause()
     }
 
     companion object {
@@ -90,9 +113,15 @@ class PageFragment : Fragment() {
         param4_txt.text = mSettings.acceleration.toString()
         frames_txt.text = mSettings.framesLeft.toString()
     }
-//    fun fragmentObserver(jsString: String): Observer<String> {
-//        var settings = Settings(jsString)
-//        preset_name_txt.text = settings.presetName
-//        return
-//    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN, priority = 1)
+    public fun onMessage(event: wsMessage){
+/*
+        Log.d("AcViewModel onMessage()", Settings.FRAMES_LEFT + ": " + postSettings.value?.framesLeft)
+        Log.d("AcViewModel onMessage()", Settings.STATE + ": " + postSettings.value?.state)
+*/
+        if (page == MainActivity.runningFragmentId)
+            viewModel.setChanges2View(page, event.framesLeft)
+    }
+
 }
