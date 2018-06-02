@@ -16,6 +16,8 @@ class TurntableView : View {
     private var mRadius: Float = 0.toFloat()
     private val mArcBounds = RectF()
 
+    var drawUpto = 46f
+
     constructor(context: Context) : super(context) {
 
         // create the Paint and set its color
@@ -67,15 +69,13 @@ class TurntableView : View {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val drawUpto = 46f
-
+//        val drawUpto = 46f
 
         val mouthInset = mRadius / 3f
         mArcBounds.set(mouthInset, mouthInset, mRadius * 2 - mouthInset, mRadius * 2 - mouthInset)
         canvas.drawArc(mArcBounds, 0f, 360f, false, mCircleGray!!)
 
         canvas.drawArc(mArcBounds, 270f, drawUpto, false, mCircleYellow!!)
-
 
     }
 

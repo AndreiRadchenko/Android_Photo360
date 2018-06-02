@@ -13,6 +13,12 @@ import android.widget.TextView
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import unidesign.photo360.R.id.turntable_view
+import android.animation.ValueAnimator
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.animation.PropertyValuesHolder
+import android.util.Log
+
 
 class PageFragment : Fragment() {
 
@@ -22,6 +28,8 @@ class PageFragment : Fragment() {
     lateinit var param2_txt: TextView
     lateinit var param3_txt: TextView
     lateinit var param4_txt: TextView
+    lateinit var turntabe: TurntableView
+    lateinit var valueAnimator: ValueAnimator
     var page: Int = 0
     lateinit var viewModel: FragmentViewModel
 
@@ -36,12 +44,23 @@ class PageFragment : Fragment() {
         param3_txt = view.findViewById(R.id.param3_value)
         param4_txt = view.findViewById(R.id.param4_value)
         val ivSettings: ImageView = view.findViewById(R.id.preset_settings)
+        turntabe = view.findViewById(R.id.turntable_view)
+        turntabe.animation
 
         ivSettings.setOnClickListener {
             var editIntent = Intent()
             editIntent.action = "intent.action.presetedit"
             editIntent.putExtra("page", page)
             startActivity(editIntent)
+        }
+
+        valueAnimator = ValueAnimator.ofFloat(0f, 360f)
+        //valueAnimator.duration = 5000
+        valueAnimator.addUpdateListener {
+            val value = it.animatedValue as Float
+            turntabe.drawUpto = value
+            Log.d("addUpdateListener", "turntabe.drawUpto = " + turntabe.drawUpto)
+            turntabe.invalidate()
         }
 
         viewModel = ViewModelProviders.of(this).get(FragmentViewModel::class.java)
@@ -59,6 +78,7 @@ class PageFragment : Fragment() {
     override fun onStart(){
         super.onStart()
         EventBus.getDefault().register(this)
+        //valueAnimator.start()
     }
 
     override fun onStop(){
@@ -112,6 +132,38 @@ class PageFragment : Fragment() {
         param3_txt.text = mSettings.speed.toString()
         param4_txt.text = mSettings.acceleration.toString()
         frames_txt.text = mSettings.framesLeft.toString()
+
+        var prevAnimValue: Float
+        var animValue: Float
+
+        var prevframeLeft = mSettings.framesLeft + 1
+        if (mSettings.framesLeft == mSettings.frame)
+            prevframeLeft = mSettings.frame
+
+        prevAnimValue = (1 - (prevframeLeft.toFloat() / mSettings.frame.toFloat()))*360f
+        animValue = (1 - (mSettings.framesLeft.toFloat() / mSettings.frame.toFloat()))*360f
+
+        Log.d("displaySettings", "mSettings.direction = " + mSettings.direction)
+        if (MainActivity.postSettings.direction == 0)
+            valueAnimator.reverse()
+/*        if (mSettings.direction == 0) {
+            prevAnimValue = (1 - (prevframeLeft.toFloat() / mSettings.frame.toFloat()))*360f
+            animValue = (1 - (mSettings.framesLeft.toFloat() / mSettings.frame.toFloat()))*360f
+        }
+        else {
+            prevAnimValue = (prevframeLeft.toFloat() / mSettings.frame.toFloat())*360f
+            animValue = (mSettings.framesLeft.toFloat() / mSettings.frame.toFloat())*360f
+            valueAnimator.reverse()
+        }*/
+
+        valueAnimator.setFloatValues(prevAnimValue, animValue)
+
+        valueAnimator.duration = mSettings.delay.toLong()
+        valueAnimator.start()
+
+//        Log.d("displaySettings", "animValue = " + animValue)
+/*        Log.d("displaySettings", "mSettings.framesLeft = " + mSettings.framesLeft)
+        Log.d("displaySettings", "mSettings.frame = " + mSettings.frame)*/
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 1)
@@ -123,5 +175,22 @@ class PageFragment : Fragment() {
         if (page == MainActivity.runningFragmentId)
             viewModel.setChanges2View(page, event.framesLeft)
     }
+
+/*    private fun createAnimator(): ValueAnimator {
+        val propertyX = PropertyValuesHolder.ofInt(PROPERTY_X, 100, 300)
+        val propertyY = PropertyValuesHolder.ofInt(PROPERTY_Y, 100, 300)
+        val propertyAlpha = PropertyValuesHolder.ofInt(PROPERTY_ALPHA, 0, 255)
+
+        val animator = ValueAnimator()
+        animator.setValues(propertyX, propertyY, propertyAlpha)
+        animator.duration = 2000
+        animator.interpolator = AccelerateDecelerateInterpolator()
+
+        animator.addUpdateListener {
+            //TODO invalidate view with new values
+        }
+
+        return animator
+    }*/
 
 }
