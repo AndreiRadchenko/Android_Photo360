@@ -9,6 +9,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiInfo
@@ -23,11 +24,17 @@ import android.provider.Contacts
 import android.support.annotation.RequiresApi
 import android.support.annotation.UiThread
 import android.support.design.R.id.visible
+import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
+import android.support.v4.app.ActivityCompat
+import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewPager
+import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
 import android.util.Log
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -51,10 +58,12 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import unidesign.photo360.R.drawable.settings
+import java.text.SimpleDateFormat
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelectedListener {
 
 
     lateinit var mprogresBar: ProgressBar
@@ -70,6 +79,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var framesLeftTxt: TextView
     lateinit var turntableView: TurntableView
     lateinit var mViewPager: ViewPager
+    lateinit var mToolbar: Toolbar
     lateinit var pageAdapter: PageAdapter
     lateinit var TurntableConectionJob: Job
     private lateinit var wifiScanReceiver: BroadcastReceiver
@@ -100,7 +110,7 @@ class MainActivity : AppCompatActivity() {
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_main_drawer)
 
         //sharedPrefs = PreferenceManager(applicationContext)
         wifiConf =  WifiConfiguration()
@@ -110,6 +120,27 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(myToolbar)
         // Get a support ActionBar corresponding to this toolbar
         val ab = supportActionBar
+        var drawer = findViewById(R.id.drawer_layout) as DrawerLayout
+
+        val navigationView = findViewById(R.id.nav_view) as NavigationView
+        navigationView.setNavigationItemSelectedListener(this)
+
+        drawer = findViewById(R.id.drawer_layout) as DrawerLayout
+        val toggle = object : ActionBarDrawerToggle(
+                this, drawer, myToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
+            override fun onDrawerOpened(drawerView: View) {
+                super.onDrawerOpened(drawerView)
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+                super.onDrawerClosed(drawerView)
+
+            }
+        }
+
+        drawer.addDrawerListener(toggle)
+
+        toggle.syncState()
 
         pageAdapter = PageAdapter(supportFragmentManager)
         var displayMetrics: DisplayMetrics? = null
@@ -292,6 +323,55 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+    }
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        // Handle navigation view item clicks here.
+        val id = item.itemId
+
+        if (id == R.id.nav_settings) {
+
+            //startActivity(Intent("intent.action.import_templates"))
+
+        } else if (id == R.id.nav_save) {
+
+/*            if (ContextCompat.checkSelfPermission(this,
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+
+                val sdf = SimpleDateFormat("_yy-MM-dd_HH-mm")
+                var mydate = sdf.format(Calendar.getInstance().time)
+                mydate = "_templates$mydate"
+
+                val newFragment = BackupDialog()
+                val args = Bundle()
+                args.putString("backup_name", mydate)
+                newFragment.setArguments(args)
+                newFragment.show(supportFragmentManager, "backup_dialog")
+
+                *//*                BackupTask AsyncBackup = new BackupTask(this);
+                AsyncBackup.execute();*//*
+            } else {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_CODE)
+            }*/
+        } else if (id == R.id.nav_restore) {
+
+/*            if (ContextCompat.checkSelfPermission(this,
+                            Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+
+                startActivity(Intent("intent.action.restore_templates"))
+            } else {
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_READ_SD)
+            }*/
+        } else if (id == R.id.nav_help) {
+
+/*            val settings_intent = Intent(this, SettingsPrefActivity::class.java)
+            startActivity(settings_intent)
+            //startActivity(new Intent("intent.action.settings"));*/
+        }
+
+        //        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        //drawer.closeDrawer(GravityCompat.START);
+        return true
     }
 
 /*    @Subscribe(threadMode = ThreadMode.MAIN)

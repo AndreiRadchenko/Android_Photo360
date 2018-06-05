@@ -143,18 +143,13 @@ class PageFragment : Fragment() {
         prevAnimValue = (1 - (prevframeLeft.toFloat() / mSettings.frame.toFloat()))*360f
         animValue = (1 - (mSettings.framesLeft.toFloat() / mSettings.frame.toFloat()))*360f
 
-        Log.d("displaySettings", "mSettings.direction = " + mSettings.direction)
-        if (MainActivity.postSettings.direction == 0)
-            valueAnimator.reverse()
-/*        if (mSettings.direction == 0) {
-            prevAnimValue = (1 - (prevframeLeft.toFloat() / mSettings.frame.toFloat()))*360f
-            animValue = (1 - (mSettings.framesLeft.toFloat() / mSettings.frame.toFloat()))*360f
+        Log.d("displaySettings", "MainActivity.postSettings.direction = " + MainActivity.postSettings.direction)
+        if (MainActivity.postSettings.direction == 0){
+            prevAnimValue = 360 - prevAnimValue
+            animValue = 360 - animValue
+            //valueAnimator.reverse()
+            //valueAnimator.setFloatValues(animValue, prevAnimValue)
         }
-        else {
-            prevAnimValue = (prevframeLeft.toFloat() / mSettings.frame.toFloat())*360f
-            animValue = (mSettings.framesLeft.toFloat() / mSettings.frame.toFloat())*360f
-            valueAnimator.reverse()
-        }*/
 
         valueAnimator.setFloatValues(prevAnimValue, animValue)
 
