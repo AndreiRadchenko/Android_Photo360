@@ -225,6 +225,8 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             //var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
             //postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
             //                                Settings().getJSON().toString())
+            if (runningFragmentId == NO_FRAGMENT_RUNNING)
+                runningFragmentId = mViewPager.currentItem
             var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
             if (currentFragment != null)
                 currentFragment.viewModel.initPreferencesRequest(runningFragmentId)

@@ -145,8 +145,8 @@ class PageFragment : Fragment() {
 
         Log.d("displaySettings", "MainActivity.postSettings.direction = " + MainActivity.postSettings.direction)
         if (MainActivity.postSettings.direction == 0){
-            prevAnimValue = 360 - prevAnimValue
-            animValue = 360 - animValue
+            prevAnimValue = - prevAnimValue
+            animValue = - animValue
             //valueAnimator.reverse()
             //valueAnimator.setFloatValues(animValue, prevAnimValue)
         }
