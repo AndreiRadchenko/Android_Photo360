@@ -18,7 +18,7 @@ class Settings() {
         public val STATE = "state"
         public val FRAMES_LEFT = "framesLeft"
         private val FRAME = "frame"
-        private val ALL_STEPS = "allSteps"
+        public val ALL_STEPS = "allSteps"
         private val PAUSE = "pause"
         private val DELAY = "delay"
         private val SPEED = "speed"
@@ -87,9 +87,9 @@ class Settings() {
     init {
         //presetFragment = 0
         presetName = "Preset 1"
-        firmwareVersion= "PhotoPizza AP"
-        wifiSsid = "Photo360"
-        wifiPassword = ""
+        firmwareVersion= "Photo360 AP"
+        wifiSsid = "Photo360_AP001"
+        wifiPassword = "Photo360_AP001"
         wsPort = 8000
         state = "waiting"
         framesLeft = 36

@@ -8,6 +8,7 @@
     <string name="preset_speed">Speed</string>
     <string name="preset_acceleration">Acceleration</string>
     <string name="preset_edit_form">Preset edit</string>
+    <string name="settings_edit_form">Settings</string>
     <string name="shooting_mode">Shooting mode</string>
     <string name="action_save">Save</string>
     <string name="preferences_saved">Preferences saved</string>
@@ -18,6 +19,12 @@
     <string name="naw_help">Help</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="turntable_wifi_ssid">Turntable WiFi SSID</string>
+    <string name="turntable_wifi_password">Turntable WiFi password</string>
+    <string name="motors_steps_per_circle">Motors steps per circle</string>
+    <string name="start_calibrate_btn">Calibrate</string>
+    <string name="stop_calibrate_btn">Stop</string>
+    <string name="sam_explanation">Sam explanation of calibration process</string>
 
     <string-array name="shootingmode_array">
         <item>Interval</item>

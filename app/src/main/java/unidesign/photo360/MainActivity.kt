@@ -1,7 +1,6 @@
 package unidesign.photo360
 
 import android.Manifest
-import android.app.ProgressDialog
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.BroadcastReceiver
@@ -20,7 +19,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import android.os.Build
 import android.os.Handler
 import android.os.Message
-import android.provider.Contacts
 import android.support.annotation.RequiresApi
 import android.support.annotation.UiThread
 import android.support.design.R.id.visible
@@ -28,6 +26,7 @@ import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.ActionBarDrawerToggle
@@ -44,11 +43,10 @@ import kotlinx.coroutines.experimental.*
 //import com.sun.org.apache.xml.internal.serializer.utils.Utils.messages
 import org.java_websocket.WebSocket
 
-import org.java_websocket.client.WebSocketClient;
-import org.java_websocket.handshake.ServerHandshake;
+import org.java_websocket.client.WebSocketClient
+import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
 import java.net.URISyntaxException
-import org.java_websocket.drafts.Draft_17
 import org.java_websocket.drafts.Draft_6455
 import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.json.JSONObject
@@ -112,6 +110,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_drawer)
 
+        val settingsPrefs = SettingsPreferences(applicationContext)
         //sharedPrefs = PreferenceManager(applicationContext)
         wifiConf =  WifiConfiguration()
         wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
@@ -172,6 +171,8 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                     else
                         buttonStopState()}
                 })
+
+        postSettings = Settings(settingsPrefs.preset1 ?: Settings().getJSON().toString())
 
         btnRunCW.setOnClickListener(View.OnClickListener {
             runningFragmentId = mViewPager.currentItem
@@ -274,6 +275,16 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
 
     }*/
 
+    override fun onBackPressed() {
+        val drawer = findViewById(R.id.drawer_layout) as DrawerLayout
+        if (drawer.isDrawerOpen(GravityCompat.START)) run {
+                drawer.closeDrawer(GravityCompat.START)
+            //mTutorialHandler.cleanUp();
+        }
+        else
+        super.onBackPressed()
+    }
+
     override fun onResume() {
         super.onResume()
 
@@ -334,6 +345,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         if (id == R.id.nav_settings) {
 
             //startActivity(Intent("intent.action.import_templates"))
+            startActivity(Intent("intent.action.settingsedit"))
 
         } else if (id == R.id.nav_save) {
 
@@ -513,8 +525,8 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         homeWiFiInfo = wifiManager.connectionInfo
         wifiConf.SSID = "\"" + networkSSID + "\""
-        //wifiConf.preSharedKey = "\"" + networkPass + "\""
-        wifiConf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
+        wifiConf.preSharedKey = "\"" + networkPass + "\""
+        wifiConf.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.WPA_PSK);
         wifiManager.addNetwork(wifiConf)
 
         if (wifiManager.connectionInfo.ssid.equals(wifiConf.SSID))
@@ -588,7 +600,8 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                 var esp32answer = JSONObject(s)
                 var frameleft = esp32answer.getInt(Settings.FRAMES_LEFT)
                 var state = esp32answer.getString(Settings.STATE)
-                EventBus.getDefault().post(wsMessage(frameleft, state))
+                var allFrames = esp32answer.getInt(Settings.ALL_STEPS)
+                EventBus.getDefault().post(wsMessage(frameleft, state, allFrames))
                 runOnUiThread {
                     Log.d("onMessage()", Settings.FRAMES_LEFT + ": " + frameleft)
                     MainActivity.postSettings.state = state
