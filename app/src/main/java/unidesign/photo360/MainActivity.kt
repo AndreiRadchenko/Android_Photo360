@@ -600,10 +600,11 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                 var esp32answer = JSONObject(s)
                 var frameleft = esp32answer.getInt(Settings.FRAMES_LEFT)
                 var state = esp32answer.getString(Settings.STATE)
-                var allFrames = esp32answer.getInt(Settings.ALL_STEPS)
-                EventBus.getDefault().post(wsMessage(frameleft, state, allFrames))
+                var allSteps = esp32answer.getInt(Settings.ALL_STEPS)
+                EventBus.getDefault().post(wsMessage(frameleft, state, allSteps))
                 runOnUiThread {
                     Log.d("onMessage()", Settings.FRAMES_LEFT + ": " + frameleft)
+                    Log.d("onMessage()", "allFrames: " + allSteps)
                     MainActivity.postSettings.state = state
                     MainActivity.postSettings.framesLeft = frameleft
 

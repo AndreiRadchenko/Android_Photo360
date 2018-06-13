@@ -42,12 +42,20 @@ class SettingsPreferences(internal var _context: Context) {
             editor.commit()
         }
 
+    var calibration: String
+        get() = pref.getString(CALIBRATION, defaultSettings)
+        set(mpreset) {
+            editor.putString(CALIBRATION, mpreset)
+            editor.commit()
+        }
+
     fun setChanges(presetNum: Int, settings: Settings){
         when (presetNum){
             0 -> preset1 = settings.getJSON().toString()
             1 -> preset2 = settings.getJSON().toString()
             2 -> preset3 = settings.getJSON().toString()
             3 -> preset4 = settings.getJSON().toString()
+            4 -> calibration = settings.getJSON().toString()
         }
     }
 
@@ -65,6 +73,7 @@ class SettingsPreferences(internal var _context: Context) {
         private val PRESET_2 = "preset2"
         private val PRESET_3 = "preset3"
         private val PRESET_4 = "preset4"
+        private val CALIBRATION = "calibration"
 
     }
 }

@@ -2,9 +2,7 @@ package unidesign.photo360
 
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
-import android.os.Build
 import android.os.Bundle
-import android.support.annotation.RequiresApi
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
@@ -12,10 +10,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
+import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.w3c.dom.Text
-import java.util.*
 
 class SettingsEdit : AppCompatActivity() {
 
@@ -26,8 +23,12 @@ class SettingsEdit : AppCompatActivity() {
     lateinit var calibrate_button: Button
     lateinit var settingsPrefs: SettingsPreferences
     lateinit var viewModel: FragmentViewModel
-    lateinit var oldSet: Settings
-    var page: Int = 0
+    var oldSet = Settings()
+    var page: Int = FragmentViewModel.CALIBRATION_MOD
+
+    companion object {
+        var calibrateSettings = Settings()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -49,6 +50,7 @@ class SettingsEdit : AppCompatActivity() {
         et_allSteps = findViewById<View>(R.id.et_allSteps) as EditText
         txtCalibrExplanation = findViewById<View>(R.id.txtCalibrExplanation) as TextView
         calibrate_button = findViewById<View>(R.id.calibrate_button) as Button
+        calibrate_button.isEnabled = false
 
         viewModel = ViewModelProviders.of(this).get(FragmentViewModel::class.java)
 
@@ -64,21 +66,51 @@ class SettingsEdit : AppCompatActivity() {
 
         calibrate_button.setOnClickListener(View.OnClickListener {
 
-            var calibrateSettings = Settings()
-            calibrateSettings.direction = 1
-            calibrateSettings.allSteps = -1 //calibration mod
-            calibrateSettings.speed = 3000
-            calibrateSettings.state = "start"
-            calibrate_button.setText(R.string.stop_calibrate_btn)
+            if (calibrateSettings?.state == "waiting" || calibrateSettings?.state == "stop"){
+                //var calibrateSettings = Settings()
+                calibrateSettings.direction = 1
+                calibrateSettings.allSteps = -1 //calibration mod
+                calibrateSettings.speed = 3000
+                calibrateSettings.state = "start"
+//                calibrate_button.setText(R.string.stop_calibrate_btn)
 
-            try {
-                MainActivity.mWebSocketClient!!.send(calibrateSettings.getJSON().toString())
+                try {
+                    MainActivity.mWebSocketClient!!.send(calibrateSettings.getJSON().toString())
+                }
+                catch (e: Exception) {
+                    Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
+                    calibrate_button.isEnabled = false
+                }
             }
-            catch (e: Exception) {
-                Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
+            else {
                 calibrate_button.setText(R.string.start_calibrate_btn)
-        }
+                calibrateSettings.state = "stop"
+                try {
+                    MainActivity.mWebSocketClient!!.send(calibrateSettings.getJSON().toString())
+                }
+                catch (e: Exception) {
+                    Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
+                    calibrate_button.isEnabled = false
+                }
+            }
+
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (MainActivity.wsConnected)
+            calibrate_button.isEnabled = true
+    }
+
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onStop() {
+        EventBus.getDefault().unregister(this)
+        super.onStop()
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -87,7 +119,9 @@ class SettingsEdit : AppCompatActivity() {
         Log.d("AcViewModel onMessage()", Settings.FRAMES_LEFT + ": " + postSettings.value?.framesLeft)
         Log.d("AcViewModel onMessage()", Settings.STATE + ": " + postSettings.value?.state)
 */
-            viewModel.setCalibration(page, event.allFrames)
+        calibrateSettings.allSteps = event.allSteps
+        calibrateSettings.state = event.state
+            viewModel.setCalibrationSettings(calibrateSettings)
     }
 
     fun displaySettings (mSettings: Settings){
@@ -95,25 +129,37 @@ class SettingsEdit : AppCompatActivity() {
         etSSID.setText(mSettings.wifiSsid)
         etPassword.setText(mSettings.wifiPassword)
         et_allSteps.setText(mSettings.allSteps.toString())
+        if (calibrateSettings?.state == "waiting" || calibrateSettings?.state == "stop")
+            calibrate_button.setText(R.string.start_calibrate_btn)
+        else
+            calibrate_button.setText(R.string.stop_calibrate_btn)
+
         //= sharedPrefs.shootingMode
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.pref_edit_menu, menu);
+        menuInflater.inflate(R.menu.settings_edit_menu, menu);
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.action_save -> {
-                for (preset in 0..3){
-                    oldSet = Settings(viewModel.getPreset(preset).value!!)
+            R.id.action_save_settings -> {
+                Log.d("In action Save", "allSteps = " + et_allSteps.text)
+                var set = Settings()
+                set.wifiSsid = etSSID.text.toString()
+                set.wifiPassword = etPassword.text.toString()
+                set.allSteps = et_allSteps.text.toString().toInt()
+
+                viewModel.saveSettings(set)
+/*                for (p in 0..4){
+                    oldSet = Settings(viewModel.getPreset(p).value!!)
                     oldSet.wifiSsid = etSSID.text.toString()
                     oldSet.wifiPassword = etPassword.text.toString()
-                    oldSet.allSteps = et_allSteps.text.toString().toInt()
-                    settingsPrefs.setChanges(preset, oldSet)
-                }
+                    oldSet.allSteps = et_allSteps.text as Int
+                    settingsPrefs.setChanges(p, oldSet)
+                }*/
 
                 Toast.makeText(applicationContext, R.string.preferences_saved, Toast.LENGTH_LONG).show()
                 finish()
