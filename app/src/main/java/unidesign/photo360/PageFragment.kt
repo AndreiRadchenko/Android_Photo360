@@ -59,7 +59,7 @@ class PageFragment : Fragment() {
         valueAnimator.addUpdateListener {
             val value = it.animatedValue as Float
             turntabe.drawUpto = value
-            Log.d("addUpdateListener", "turntabe.drawUpto = " + turntabe.drawUpto)
+            //Log.d("addUpdateListener", "turntabe.drawUpto = " + turntabe.drawUpto)
             turntabe.invalidate()
         }
 
@@ -120,7 +120,8 @@ class PageFragment : Fragment() {
             val fragment = PageFragment()
             val args = Bundle()
             args.putInt(PAGE_NUM, page)
-            fragment.setArguments(args)
+            //fragment.setArguments(args)
+            fragment.arguments = args
             return fragment
         }
     }

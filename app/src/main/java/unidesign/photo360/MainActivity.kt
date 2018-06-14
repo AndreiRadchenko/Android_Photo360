@@ -104,13 +104,14 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     }
 
     lateinit var viewModel: ActivityViewModel
+    lateinit var settingsPrefs: SettingsPreferences
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main_drawer)
 
-        val settingsPrefs = SettingsPreferences(applicationContext)
+        settingsPrefs = SettingsPreferences(applicationContext)
         //sharedPrefs = PreferenceManager(applicationContext)
         wifiConf =  WifiConfiguration()
         wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
@@ -450,6 +451,9 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                         Toast.makeText(application, "Please, enable WiFi connection", Toast.LENGTH_SHORT).show()
                     }
                     else {
+                        var wifiset = Settings(settingsPrefs.preset1 ?: Settings().getJSON().toString())
+                        postSettings.wifiSsid = wifiset.wifiSsid
+                        postSettings.wifiPassword = wifiset.wifiPassword
                         menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected))
                         mprogresBar.visibility = View.VISIBLE
                         wifiManager.startScan()

@@ -59,6 +59,24 @@ class SettingsPreferences(internal var _context: Context) {
         }
     }
 
+    fun saveSettings(set: Settings) {
+        preset1 = saveSettingsInPreset(set, preset1)
+        preset2 = saveSettingsInPreset(set, preset2)
+        preset3 = saveSettingsInPreset(set, preset3)
+        preset4 = saveSettingsInPreset(set, preset4)
+        calibration = saveSettingsInPreset(set, calibration)
+    }
+
+    fun saveSettingsInPreset(set: Settings, preset: String): String{
+
+        var newSettings = Settings(preset)
+        newSettings.wifiSsid = set.wifiSsid
+        newSettings.wifiPassword = set.wifiPassword
+        newSettings.allSteps = set.allSteps
+
+        return newSettings.getJSON().toString()
+    }
+
     init {
         pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
         editor = pref.edit()

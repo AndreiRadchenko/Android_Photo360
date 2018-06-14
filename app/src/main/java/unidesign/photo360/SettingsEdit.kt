@@ -152,7 +152,7 @@ class SettingsEdit : AppCompatActivity() {
                 set.wifiPassword = etPassword.text.toString()
                 set.allSteps = et_allSteps.text.toString().toInt()
 
-                viewModel.saveSettings(set)
+                settingsPrefs.saveSettings(set)
 /*                for (p in 0..4){
                     oldSet = Settings(viewModel.getPreset(p).value!!)
                     oldSet.wifiSsid = etSSID.text.toString()
