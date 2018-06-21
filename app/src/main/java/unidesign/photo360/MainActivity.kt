@@ -25,6 +25,7 @@ import android.support.design.R.id.visible
 import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
 import android.support.v4.app.ActivityCompat
+import android.support.v4.app.DialogFragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
@@ -56,12 +57,14 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import unidesign.photo360.R.drawable.settings
+import unidesign.photo360.save_restore.BackupDialog
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 
-class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelectedListener,
+        BackupDialog.NoticeDialogListener {
 
 
     lateinit var mprogresBar: ProgressBar
@@ -80,9 +83,11 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     lateinit var mToolbar: Toolbar
     lateinit var pageAdapter: PageAdapter
     lateinit var TurntableConectionJob: Job
+    lateinit var drawer: DrawerLayout
     private lateinit var wifiScanReceiver: BroadcastReceiver
     //represents a common pool of shared threads as the coroutine dispatcher
     private val bgContext: CoroutineContext = CommonPool
+    internal val PERMISSION_REQUEST_CODE = 1
     //private var runningFragmentId: Int = NO_FRAGMENT_RUNNING
     //var postSettings: Settings = Settings()
     //public val sharedPrefs = PreferenceManager(applicationContext)
@@ -106,6 +111,18 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     lateinit var viewModel: ActivityViewModel
     lateinit var settingsPrefs: SettingsPreferences
 
+    // NoticeDialogListener interface
+    override fun onDialogPositiveClick(dialog: DialogFragment, name: String, comment: String) {
+        // User touched the dialog's positive button
+/*        val AsyncBackup = BackupTask(this)
+        AsyncBackup.execute(name, comment)*/
+        drawer.closeDrawer(Gravity.LEFT, false)
+    }
+
+    override fun onDialogNegativeClick(dialog: DialogFragment) {
+
+    }
+
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -120,7 +137,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         setSupportActionBar(myToolbar)
         // Get a support ActionBar corresponding to this toolbar
         val ab = supportActionBar
-        var drawer = findViewById(R.id.drawer_layout) as DrawerLayout
+        drawer = findViewById(R.id.drawer_layout) as DrawerLayout
 
         val navigationView = findViewById(R.id.nav_view) as NavigationView
         navigationView.setNavigationItemSelectedListener(this)
@@ -350,24 +367,21 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
 
         } else if (id == R.id.nav_save) {
 
-/*            if (ContextCompat.checkSelfPermission(this,
+            if (ContextCompat.checkSelfPermission(this,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
-                val sdf = SimpleDateFormat("_yy-MM-dd_HH-mm")
-                var mydate = sdf.format(Calendar.getInstance().time)
-                mydate = "_templates$mydate"
-
                 val newFragment = BackupDialog()
-                val args = Bundle()
-                args.putString("backup_name", mydate)
-                newFragment.setArguments(args)
+//                val args = Bundle()
+//                args.putString("backup_name", mydate)
+//                newFragment.setArguments(args)
                 newFragment.show(supportFragmentManager, "backup_dialog")
 
-                *//*                BackupTask AsyncBackup = new BackupTask(this);
-                AsyncBackup.execute();*//*
+/*                BackupTask AsyncBackup = new BackupTask(this);
+                AsyncBackup.execute();*/
             } else {
-                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_CODE)
-            }*/
+                ActivityCompat.requestPermissions(this,
+                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_CODE)
+            }
         } else if (id == R.id.nav_restore) {
 
 /*            if (ContextCompat.checkSelfPermission(this,
