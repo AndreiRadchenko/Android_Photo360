@@ -5,69 +5,29 @@ import android.content.SharedPreferences
 import org.json.JSONException
 import org.json.JSONObject
 
-class SettingsPreferences(internal var _context: Context) {
+class SettingsPreferences(_context: Context) {
 
-    internal var pref: SharedPreferences
-    internal var editor: SharedPreferences.Editor
-    internal val defaultSettings = Settings().getJSON().toString()
+    var mcontext: Context// = _context
 
-    // shared pref mode
-    internal var PRIVATE_MODE = 0
+    init  {
+        mcontext = _context
+    }
 
-    var preset1: String
-        get() = pref.getString(PRESET_1, defaultSettings)
-        set(mpreset) {
-            editor.putString(PRESET_1, mpreset)
-            editor.commit()
-        }
-
-    var preset2: String
-        get() = pref.getString(PRESET_2, defaultSettings)
-        set(mpreset) {
-            editor.putString(PRESET_2, mpreset)
-            editor.commit()
-        }
-
-    var preset3: String
-        get() = pref.getString(PRESET_3, defaultSettings)
-        set(mpreset) {
-            editor.putString(PRESET_3, mpreset)
-            editor.commit()
-        }
-
-    var preset4: String
-        get() = pref.getString(PRESET_4, defaultSettings)
-        set(mpreset) {
-            editor.putString(PRESET_4, mpreset)
-            editor.commit()
-        }
-
-    var calibration: String
-        get() = pref.getString(CALIBRATION, defaultSettings)
-        set(mpreset) {
-            editor.putString(CALIBRATION, mpreset)
-            editor.commit()
-        }
+    var presetArray = arrayOf(Preset(mcontext, PRESET_1), Preset(mcontext, PRESET_2), Preset(mcontext, PRESET_3),
+            Preset(mcontext, PRESET_4), Preset(mcontext, CALIBRATION))
 
     fun setChanges(presetNum: Int, settings: Settings){
-        when (presetNum){
-            0 -> preset1 = settings.getJSON().toString()
-            1 -> preset2 = settings.getJSON().toString()
-            2 -> preset3 = settings.getJSON().toString()
-            3 -> preset4 = settings.getJSON().toString()
-            4 -> calibration = settings.getJSON().toString()
-        }
+        presetArray[presetNum].set(settings.getJSON().toString())
     }
 
     fun saveSettings(set: Settings) {
-        preset1 = saveSettingsInPreset(set, preset1)
-        preset2 = saveSettingsInPreset(set, preset2)
-        preset3 = saveSettingsInPreset(set, preset3)
-        preset4 = saveSettingsInPreset(set, preset4)
-        calibration = saveSettingsInPreset(set, calibration)
+
+        for (i in presetArray.indices){
+            presetArray[i].set( saveSettingsInPreset(set, presetArray[i].get()) )
+        }
     }
 
-    fun saveSettingsInPreset(set: Settings, preset: String): String{
+    fun saveSettingsInPreset(set: Settings, preset: String): String {
 
         var newSettings = Settings(preset)
         newSettings.wifiSsid = set.wifiSsid
@@ -77,23 +37,18 @@ class SettingsPreferences(internal var _context: Context) {
         return newSettings.getJSON().toString()
     }
 
-    init {
-        pref = _context.getSharedPreferences(PREF_NAME, PRIVATE_MODE)
-        editor = pref.edit()
-    }
-
+//    init {
+//
+//
+//    }
     companion object {
-
-        // Shared preferences file name
-        private val PREF_NAME = "Main4_preferences"
-
-        private val PRESET_1 = "preset1"
-        private val PRESET_2 = "preset2"
-        private val PRESET_3 = "preset3"
-        private val PRESET_4 = "preset4"
-        private val CALIBRATION = "calibration"
-
+        private val PRESET_1 = 0
+        private val PRESET_2 = 1
+        private val PRESET_3 = 2
+        private val PRESET_4 = 3
+        private val CALIBRATION = 4
     }
+
 }
 
 /*var config = {

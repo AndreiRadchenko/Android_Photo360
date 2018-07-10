@@ -63,14 +63,12 @@ class PageFragment : Fragment() {
             turntabe.invalidate()
         }
 
-        viewModel = ViewModelProviders.of(this).get(FragmentViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, CustomViewModelFactory(this.activity!!.application, page)).
+                get(FragmentViewModel::class.java)
 
-        viewModel.getPreset(page).
-                observe(this, object: Observer<String> {
-                    override fun onChanged(jss: String?) {
-                        var settings = Settings(jss!!)
-                        displaySettings(settings)
-                    }
+        viewModel.getPreset().
+                observe(this, Observer<Settings> { set ->
+                    displaySettings(set!!)
                 })
         return view
     }
@@ -89,7 +87,7 @@ class PageFragment : Fragment() {
     override fun onResume() {
         viewModel.initPreferencesRequest(page)
         if (page == MainActivity.runningFragmentId)
-            viewModel.setChanges2View(page, MainActivity.postSettings.framesLeft)
+            viewModel.setChanges2View(MainActivity.postSettings.framesLeft)
 
         if (page == MainActivity.currentFragmentId){
             //var frames =  MainActivity.sharedPrefs?.framesLeft.toString()
@@ -169,7 +167,7 @@ class PageFragment : Fragment() {
         Log.d("AcViewModel onMessage()", Settings.STATE + ": " + postSettings.value?.state)
 */
         if (page == MainActivity.runningFragmentId)
-            viewModel.setChanges2View(page, event.framesLeft)
+            viewModel.setChanges2View(event.framesLeft)
     }
 
 /*    private fun createAnimator(): ValueAnimator {

@@ -57,14 +57,17 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import unidesign.photo360.R.drawable.settings
-import unidesign.photo360.save_restore.BackupDialog
+
+//import unidesign.photo360.save_restore.BackupDialog
+
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
 
-class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelectedListener,
-        BackupDialog.NoticeDialogListener {
+class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelectedListener
+        //todo BackupDialog.NoticeDialogListener
+{
 
 
     lateinit var mprogresBar: ProgressBar
@@ -111,17 +114,17 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     lateinit var viewModel: ActivityViewModel
     lateinit var settingsPrefs: SettingsPreferences
 
-    // NoticeDialogListener interface
-    override fun onDialogPositiveClick(dialog: DialogFragment, name: String, comment: String) {
+    //todo  NoticeDialogListener interface
+/*    override fun onDialogPositiveClick(dialog: DialogFragment, name: String, comment: String) {
         // User touched the dialog's positive button
-/*        val AsyncBackup = BackupTask(this)
-        AsyncBackup.execute(name, comment)*/
+*//*        val AsyncBackup = BackupTask(this)
+        AsyncBackup.execute(name, comment)*//*
         drawer.closeDrawer(Gravity.LEFT, false)
     }
 
     override fun onDialogNegativeClick(dialog: DialogFragment) {
 
-    }
+    }*/
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -190,15 +193,14 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                         buttonStopState()}
                 })
 
-        postSettings = Settings(settingsPrefs.preset1 ?: Settings().getJSON().toString())
+        postSettings = Settings(settingsPrefs.presetArray[0].get() ?: Settings().getJSON().toString())
 
         btnRunCW.setOnClickListener(View.OnClickListener {
             runningFragmentId = mViewPager.currentItem
             Log.d("OnClickListener()", "runningFragmentId: " + runningFragmentId)
             //runningFragmentId = mViewPager.currentItem
             var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
-            postSettings = Settings(currentFragment.viewModel.getPreset(runningFragmentId).value ?:
-                                            Settings().getJSON().toString())
+            postSettings = currentFragment.viewModel.getPreset().value ?: Settings()
 
             postSettings.direction = 1
             postSettings.state = "start"
@@ -221,8 +223,8 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             runningFragmentId = mViewPager.currentItem
             //runningFragmentId = mViewPager.currentItem
             var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
-            postSettings = Settings(currentFragment.viewModel.getPreset(runningFragmentId).value ?:
-                                            Settings().getJSON().toString())
+            postSettings = currentFragment.viewModel.getPreset().value ?: Settings()
+
             postSettings.direction = 0
             postSettings.state = "start"
             viewModel.setSettings(postSettings)
@@ -370,11 +372,8 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             if (ContextCompat.checkSelfPermission(this,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
-                val newFragment = BackupDialog()
-//                val args = Bundle()
-//                args.putString("backup_name", mydate)
-//                newFragment.setArguments(args)
-                newFragment.show(supportFragmentManager, "backup_dialog")
+/* todo               val newFragment = BackupDialog()
+                newFragment.show(supportFragmentManager, "backup_dialog")*/
 
 /*                BackupTask AsyncBackup = new BackupTask(this);
                 AsyncBackup.execute();*/
@@ -465,7 +464,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                         Toast.makeText(application, "Please, enable WiFi connection", Toast.LENGTH_SHORT).show()
                     }
                     else {
-                        var wifiset = Settings(settingsPrefs.preset1 ?: Settings().getJSON().toString())
+                        var wifiset = Settings(settingsPrefs.presetArray[0].get() ?: Settings().getJSON().toString())
                         postSettings.wifiSsid = wifiset.wifiSsid
                         postSettings.wifiPassword = wifiset.wifiPassword
                         menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected))

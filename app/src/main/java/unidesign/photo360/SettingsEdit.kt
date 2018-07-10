@@ -52,17 +52,14 @@ class SettingsEdit : AppCompatActivity() {
         calibrate_button = findViewById<View>(R.id.calibrate_button) as Button
         calibrate_button.isEnabled = false
 
-        viewModel = ViewModelProviders.of(this).get(FragmentViewModel::class.java)
+        //viewModel = ViewModelProviders.of(this).get(FragmentViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, CustomViewModelFactory(this!!.application, 4)).
+                get(FragmentViewModel::class.java)
 
-        viewModel.getPreset(page).
-                observe(this, object: Observer<String> {
-                    override fun onChanged(jss: String?) {
-                        var settings = Settings(jss!!)
-                        displaySettings(settings)
-                    }
-                })
+        viewModel.getPreset().
+                observe(this, Observer<Settings> { set -> displaySettings(set!!) })
 
-        viewModel.initPreferencesRequest(page)
+        viewModel.initPreferencesRequest(4)
 
         calibrate_button.setOnClickListener(View.OnClickListener {
 

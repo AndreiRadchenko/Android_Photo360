@@ -71,14 +71,13 @@ class PresetEdit : AppCompatActivity() {
         // Apply the adapter to the spinner
         etShootingMode.adapter = adapter
 
-        viewModel = ViewModelProviders.of(this).get(FragmentViewModel::class.java)
+        //viewModel = ViewModelProviders.of(this).get(FragmentViewModel::class.java)
+        viewModel = ViewModelProviders.of(this, CustomViewModelFactory(this.application, page)).
+                get(FragmentViewModel::class.java)
 
-        viewModel.getPreset(page).
-                observe(this, object: Observer<String> {
-                    override fun onChanged(jss: String?) {
-                        var settings = Settings(jss!!)
-                        displaySettings(settings)
-                    }
+        viewModel.getPreset().
+                observe(this, Observer<Settings> { set ->
+                    displaySettings(set!!)
                 })
 
 /*        when (page) {
@@ -159,7 +158,7 @@ class PresetEdit : AppCompatActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
             R.id.action_save -> {
-                oldSet = Settings(viewModel.getPreset(page).value!!)
+                oldSet = viewModel.getPreset().value!!
 /*                when (page) {
                     0 -> oldSet = Settings(viewModel.getPreset1().value!!)
                     1 -> oldSet = Settings(viewModel.getPreset2().value!!)
