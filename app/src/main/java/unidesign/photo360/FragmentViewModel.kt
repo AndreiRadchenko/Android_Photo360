@@ -25,7 +25,6 @@ class FragmentViewModel(var app: Application, var page: Int) : AndroidViewModel(
         postSettings.value = Settings(settingsPrefs.presetArray[page].get())
     }
 
-    //todo - set all postSettings.value
     fun setChanges2View(framesLeft: Int) {
         var newSet = postSettings.value
         newSet!!.framesLeft = framesLeft
@@ -33,7 +32,6 @@ class FragmentViewModel(var app: Application, var page: Int) : AndroidViewModel(
 
     }
 
-    //todo - set all postSettings.value
     fun setCalibrationSettings(calibrateSettings: Settings) {
         var newSet = postSettings.value
         newSet!!.allSteps = calibrateSettings.allSteps

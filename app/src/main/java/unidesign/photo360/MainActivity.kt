@@ -56,6 +56,7 @@ import kotlinx.coroutines.experimental.android.UI
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import unidesign.photo360.BackupRestore.BackupDialog
 import unidesign.photo360.R.drawable.settings
 
 //import unidesign.photo360.save_restore.BackupDialog
@@ -65,8 +66,8 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 
-class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelectedListener
-        //todo BackupDialog.NoticeDialogListener
+class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelectedListener,
+                            BackupDialog.NoticeDialogListener
 {
 
 
@@ -115,16 +116,16 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     lateinit var settingsPrefs: SettingsPreferences
 
     //todo  NoticeDialogListener interface
-/*    override fun onDialogPositiveClick(dialog: DialogFragment, name: String, comment: String) {
+    override fun onDialogPositiveClick(dialog: DialogFragment, name: String, comment: String) {
         // User touched the dialog's positive button
-*//*        val AsyncBackup = BackupTask(this)
-        AsyncBackup.execute(name, comment)*//*
+        //val AsyncBackup = BackupTask(this)
+        //AsyncBackup.execute(name, comment)
         drawer.closeDrawer(Gravity.LEFT, false)
     }
 
     override fun onDialogNegativeClick(dialog: DialogFragment) {
 
-    }*/
+    }
 
     @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -372,8 +373,8 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             if (ContextCompat.checkSelfPermission(this,
                             Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
-/* todo               val newFragment = BackupDialog()
-                newFragment.show(supportFragmentManager, "backup_dialog")*/
+                val newFragment = BackupDialog()
+                newFragment.show(supportFragmentManager, "backup_dialog")
 
 /*                BackupTask AsyncBackup = new BackupTask(this);
                 AsyncBackup.execute();*/
