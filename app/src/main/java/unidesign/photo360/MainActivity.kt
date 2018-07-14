@@ -59,6 +59,7 @@ import org.greenrobot.eventbus.ThreadMode
 import unidesign.photo360.BackupRestore.BackupDialog
 import unidesign.photo360.BackupRestore.BackupTask
 import unidesign.photo360.R.drawable.settings
+import java.lang.Runnable
 
 //import unidesign.photo360.save_restore.BackupDialog
 
@@ -119,12 +120,23 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     //todo  NoticeDialogListener interface
     override fun onDialogPositiveClick(dialog: DialogFragment, name: String, comment: String) {
         // User touched the dialog's positive button
+        var backupDialog = dialog as BackupDialog
         if (name != "") {
             val AsyncBackup = BackupTask(this)
             AsyncBackup.execute(name, comment)
             drawer.closeDrawer(Gravity.LEFT, false)
         } else {
-            Toast.makeText(application, getString(R.string.Enter_file_name), Toast.LENGTH_SHORT).show()
+            backupDialog.setMessage(getString(R.string.enter_backup_name))
+            val h = Handler()
+            h.postDelayed(Runnable {
+                //Log.d("post delayed handler", "run dialog.resetMessage()")
+                try {
+                    backupDialog.resetMessage()
+                } catch (e: Exception) {
+                    Log.d("post delayed exeption", e.toString())
+                }
+            }, 3000)
+            //Toast.makeText(application, getString(R.string.Enter_file_name), Toast.LENGTH_SHORT).show()
         }
 
     }

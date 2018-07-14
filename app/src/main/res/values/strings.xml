@@ -35,6 +35,8 @@
     <string name="no_sdcard">External SD card is inaccessible</string>
     <string name="Backup_sucsess">Backup %1$s is added</string>
     <string name="Enter_file_name">Enter backup file name</string>
+    <string name="dialog_def_msg">Save presets to file</string>
+    <string name="enter_backup_name">Please, enter backup file name</string>
 
     <string-array name="shootingmode_array">
         <item>Interval</item>
