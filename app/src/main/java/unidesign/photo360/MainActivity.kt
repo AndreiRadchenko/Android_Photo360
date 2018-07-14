@@ -124,6 +124,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         if (name != "") {
             val AsyncBackup = BackupTask(this)
             AsyncBackup.execute(name, comment)
+            backupDialog.dismiss()
             drawer.closeDrawer(Gravity.LEFT, false)
         } else {
             backupDialog.setMessage(getString(R.string.enter_backup_name))

@@ -88,6 +88,7 @@ class BackupDialog : DialogFragment() {
             override fun onClick(v: View) {
                 mListener.onDialogPositiveClick(this@BackupDialog, eName.text.toString(),
                         eComment.text.toString())
+//                alertDialog.dismiss()
             }
         })
     }
