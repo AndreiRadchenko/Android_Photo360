@@ -189,10 +189,11 @@
     </RelativeLayout>
 
     <RelativeLayout
+        android:id="@+id/fragment_turntable_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/fragment_turntable_view"
-        android:layout_below="@+id/fragment_params_row2">
+        android:layout_below="@+id/fragment_params_row2"
+        android:layout_centerHorizontal="true">
 
         <unidesign.photo360.TurntableView
             android:id="@+id/turntable_view"

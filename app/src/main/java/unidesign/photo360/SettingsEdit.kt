@@ -19,6 +19,7 @@ class SettingsEdit : AppCompatActivity() {
     lateinit var etSSID: EditText
     lateinit var etPassword: EditText
     lateinit var et_allSteps: EditText
+    lateinit var et_callSpeed: EditText
     lateinit var txtCalibrExplanation: TextView
     lateinit var calibrate_button: Button
     lateinit var settingsPrefs: SettingsPreferences
@@ -48,6 +49,7 @@ class SettingsEdit : AppCompatActivity() {
         etSSID = findViewById<View>(R.id.etSSID) as EditText
         etPassword = findViewById<View>(R.id.etPassword) as EditText
         et_allSteps = findViewById<View>(R.id.et_allSteps) as EditText
+        et_callSpeed = findViewById<View>(R.id.et_callSpeed) as EditText
         txtCalibrExplanation = findViewById<View>(R.id.txtCalibrExplanation) as TextView
         calibrate_button = findViewById<View>(R.id.calibrate_button) as Button
         calibrate_button.isEnabled = false
@@ -59,7 +61,7 @@ class SettingsEdit : AppCompatActivity() {
         viewModel.getPreset().
                 observe(this, Observer<Settings> { set -> displaySettings(set!!) })
 
-        viewModel.initPreferencesRequest(4)
+        viewModel.initPreferencesRequest()
 
         calibrate_button.setOnClickListener(View.OnClickListener {
 
@@ -67,7 +69,7 @@ class SettingsEdit : AppCompatActivity() {
                 //var calibrateSettings = Settings()
                 calibrateSettings.direction = 1
                 calibrateSettings.allSteps = -1 //calibration mod
-                calibrateSettings.speed = 3000
+                calibrateSettings.speed = et_callSpeed.text.toString().toInt()
                 calibrateSettings.state = "start"
 //                calibrate_button.setText(R.string.stop_calibrate_btn)
 
@@ -126,6 +128,7 @@ class SettingsEdit : AppCompatActivity() {
         etSSID.setText(mSettings.wifiSsid)
         etPassword.setText(mSettings.wifiPassword)
         et_allSteps.setText(mSettings.allSteps.toString())
+        et_callSpeed.setText(mSettings.speed.toString())
         if (calibrateSettings?.state == "waiting" || calibrateSettings?.state == "stop")
             calibrate_button.setText(R.string.start_calibrate_btn)
         else
@@ -148,8 +151,10 @@ class SettingsEdit : AppCompatActivity() {
                 set.wifiSsid = etSSID.text.toString()
                 set.wifiPassword = etPassword.text.toString()
                 set.allSteps = et_allSteps.text.toString().toInt()
+                set.speed = et_callSpeed.text.toString().toInt()
 
                 settingsPrefs.saveSettings(set)
+                settingsPrefs.setChanges(4, set)
 /*                for (p in 0..4){
                     oldSet = Settings(viewModel.getPreset(p).value!!)
                     oldSet.wifiSsid = etSSID.text.toString()

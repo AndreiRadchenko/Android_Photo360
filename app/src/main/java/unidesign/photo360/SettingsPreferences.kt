@@ -33,6 +33,7 @@ class SettingsPreferences(_context: Context) {
         newSettings.wifiSsid = set.wifiSsid
         newSettings.wifiPassword = set.wifiPassword
         newSettings.allSteps = set.allSteps
+        //newSettings.speed = set.speed
 
         return newSettings.getJSON().toString()
     }

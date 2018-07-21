@@ -21,7 +21,7 @@ class FragmentViewModel(var app: Application, var page: Int) : AndroidViewModel(
         postSettings.value = Settings(settingsPrefs.presetArray[page].get())
     }
 
-    fun initPreferencesRequest(page: Int) {
+    fun initPreferencesRequest() {
         postSettings.value = Settings(settingsPrefs.presetArray[page].get())
     }
 

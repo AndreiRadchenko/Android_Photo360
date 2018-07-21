@@ -100,7 +100,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     //public val sharedPrefs = PreferenceManager(applicationContext)
     companion object {
         //var sharedPrefs: PreferenceManager? = null
-        val NO_FRAGMENT_RUNNING = -1
+        val NO_FRAGMENT_RUNNING = 100
         var currentFragmentId: Int = 0
         var runningFragmentId: Int = NO_FRAGMENT_RUNNING
         var mstate: String = "waiting"
@@ -188,6 +188,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         // create fragments from 0 to 9
         for (i in 0..3) {
             pageAdapter.add(PageFragment.newInstance(i), "Tab$i")
+            Log.d("MainActivity.OnCreate", "PageFragment.newInstance($i)")
         }
 
         mViewPager = findViewById(R.id.view_pager)
@@ -222,7 +223,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
             postSettings = currentFragment.viewModel.getPreset().value ?: Settings()
 
-            postSettings.direction = 1
+            postSettings.direction = 0
             postSettings.state = "start"
             //postSettings.presetFragment = currentFragmentId
             viewModel.setSettings(postSettings)
@@ -245,7 +246,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
             postSettings = currentFragment.viewModel.getPreset().value ?: Settings()
 
-            postSettings.direction = 0
+            postSettings.direction = 1
             postSettings.state = "start"
             viewModel.setSettings(postSettings)
             //viewModel.setTtRun(true)
@@ -270,7 +271,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                 runningFragmentId = mViewPager.currentItem
             var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
             if (currentFragment != null)
-                currentFragment.viewModel.initPreferencesRequest(runningFragmentId)
+                currentFragment.viewModel.initPreferencesRequest()
             postSettings.state = "stop"
             //postSettings.framesLeft = postSettings.frame
             viewModel.setSettings(postSettings)
@@ -370,7 +371,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
 
     override fun onPause() {
         currentFragmentId = mViewPager.currentItem
-        //runningFragmentId = mViewPager.currentItem
+        //runningFragmentId = runningFragmentId
         super.onPause()
     }
 
@@ -640,8 +641,8 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                 var allSteps = esp32answer.getInt(Settings.ALL_STEPS)
                 EventBus.getDefault().post(wsMessage(frameleft, state, allSteps))
                 runOnUiThread {
-                    Log.d("onMessage()", Settings.FRAMES_LEFT + ": " + frameleft)
-                    Log.d("onMessage()", "allFrames: " + allSteps)
+                    //Log.d("onMessage()", Settings.FRAMES_LEFT + ": " + frameleft)
+                    //Log.d("onMessage()", "allFrames: " + allSteps)
                     MainActivity.postSettings.state = state
                     MainActivity.postSettings.framesLeft = frameleft
 

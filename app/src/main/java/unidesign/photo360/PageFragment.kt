@@ -18,6 +18,7 @@ import android.animation.ValueAnimator
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.animation.PropertyValuesHolder
 import android.util.Log
+import unidesign.photo360.MainActivity.Companion.runningFragmentId
 
 
 class PageFragment : Fragment() {
@@ -35,7 +36,7 @@ class PageFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_page, container, false)
-        page = getArguments()!!.getInt(PAGE_NUM)
+        page = arguments!!.getInt(PAGE_NUM)
 
         frames_txt = view.findViewById(R.id.frames_left_txt)
         preset_name_txt = view.findViewById(R.id.preset_name)
@@ -85,20 +86,10 @@ class PageFragment : Fragment() {
     }
 
     override fun onResume() {
-        viewModel.initPreferencesRequest(page)
-        if (page == MainActivity.runningFragmentId)
+        viewModel.initPreferencesRequest()
+        if (page == runningFragmentId)
             viewModel.setChanges2View(MainActivity.postSettings.framesLeft)
 
-        if (page == MainActivity.currentFragmentId){
-            //var frames =  MainActivity.sharedPrefs?.framesLeft.toString()
-            //Log.d("PageFragment onResume()", "frames number set to " + frames)
-            //frames_txt?.text = frames
-        }
-        else {
-            //var frames =  MainActivity.sharedPrefs?.frame.toString()
-           // Log.d("PageFragment onResume()", "frames number set to " + frames)
-            //frames_txt?.text = frames
-        }
         super.onResume()
     }
 
@@ -142,8 +133,8 @@ class PageFragment : Fragment() {
         prevAnimValue = (1 - (prevframeLeft.toFloat() / mSettings.frame.toFloat()))*360f
         animValue = (1 - (mSettings.framesLeft.toFloat() / mSettings.frame.toFloat()))*360f
 
-        Log.d("displaySettings", "MainActivity.postSettings.direction = " + MainActivity.postSettings.direction)
-        if (MainActivity.postSettings.direction == 0){
+        //Log.d("displaySettings", "MainActivity.postSettings.direction = " + MainActivity.postSettings.direction)
+        if (MainActivity.postSettings.direction == 1){
             prevAnimValue = - prevAnimValue
             animValue = - animValue
             //valueAnimator.reverse()
@@ -162,11 +153,9 @@ class PageFragment : Fragment() {
 
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 1)
     public fun onMessage(event: wsMessage){
-/*
-        Log.d("AcViewModel onMessage()", Settings.FRAMES_LEFT + ": " + postSettings.value?.framesLeft)
-        Log.d("AcViewModel onMessage()", Settings.STATE + ": " + postSettings.value?.state)
-*/
-        if (page == MainActivity.runningFragmentId)
+        Log.d("PageFragment.onMessage", Settings.FRAMES_LEFT + ": " + event.framesLeft)
+        Log.d("PageFragment.onMessage", "page = $page, MainActivity.runningFragmentId = " + runningFragmentId)
+        if (page == runningFragmentId)
             viewModel.setChanges2View(event.framesLeft)
     }
 

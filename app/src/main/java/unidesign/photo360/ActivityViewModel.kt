@@ -4,16 +4,11 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
-import android.content.Context
-import android.util.Log
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 
 class ActivityViewModel(var app: Application) : AndroidViewModel( app) {
 
     //private val pref = SettingsPreferences(app)
-    private var runnigFragment: Int = 0
+    private var runningFragment: Int = 0
     private val isTurntableRunning = MutableLiveData<Boolean>()
     private val postSettings = MutableLiveData<Settings>()
 
@@ -26,11 +21,11 @@ class ActivityViewModel(var app: Application) : AndroidViewModel( app) {
     }
 
     fun setRunningFragment(frag: Int){
-        runnigFragment = frag
+        runningFragment = frag
     }
 
     fun getRunningFragment(): Int {
-        return runnigFragment
+        return runningFragment
     }
 
     fun setTtRun(mrun: Boolean){

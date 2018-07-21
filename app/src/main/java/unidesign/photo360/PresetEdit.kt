@@ -132,7 +132,7 @@ class PresetEdit : AppCompatActivity() {
             }
         }
 
-        viewModel.initPreferencesRequest(page)
+        viewModel.initPreferencesRequest()
     }
 
     fun displaySettings (mSettings: Settings){

@@ -97,7 +97,7 @@ class Settings() {
         allSteps = 109000
         pause = 100
         delay = 300
-        speed = 3000
+        speed = 300
         acceleration = 100
         shootingMode = "inter"
         direction = 1

@@ -74,6 +74,22 @@
                 android:layout_weight="1"
                 android:layout_gravity="left">
                 <EditText
+                    android:id="@+id/et_callSpeed"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/callibration_speed"
+                    android:inputType="number">
+                </EditText>
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:layout_weight="1"
+                android:layout_gravity="left">
+                <EditText
                     android:id="@+id/et_allSteps"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -86,9 +102,10 @@
             <Button
                 android:id="@+id/calibrate_button"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="64dp"
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
+                android:height="@android:dimen/notification_large_icon_height"
                 android:elevation="5dp"
                 android:text="@string/start_calibrate_btn" />
 

@@ -63,9 +63,10 @@
 
             <RelativeLayout
                 android:id="@+id/buttons_layout"
-                android:layout_width="378dp"
-                android:layout_height="56dp"
+                android:layout_width="match_parent"
+                android:layout_height="64dp"
                 android:layout_alignParentBottom="true"
+                android:layout_marginBottom="11dp"
                 app:layout_anchor="@+id/view_pager"
                 app:layout_anchorGravity="bottom|center"
                 tools:layout_editor_absoluteX="-1dp"
@@ -73,24 +74,28 @@
 
                 <Button
                     android:id="@+id/button_stop"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
                     android:layout_centerHorizontal="true"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginRight="11dp"
                     android:text="stop"
                     tools:text="stop" />
 
                 <Button
                     android:id="@+id/button_run_cw"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
                     android:layout_toEndOf="@+id/button_stop"
                     android:text="turn cw"
                     tools:text="turn cw" />
 
                 <Button
                     android:id="@+id/button_run_ccw"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
                     android:layout_toStartOf="@+id/button_stop"
                     android:text="turn ccw"
                     tools:text="turn ccw" />
