@@ -72,33 +72,56 @@
                 tools:layout_editor_absoluteX="-1dp"
                 tools:layout_editor_absoluteY="503dp">
 
-                <Button
+                <ImageButton
                     android:id="@+id/button_stop"
                     android:layout_width="100dp"
-                    android:layout_height="match_parent"
+                    android:layout_height="64dp"
+                    android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
                     android:layout_marginLeft="11dp"
                     android:layout_marginRight="11dp"
                     android:text="stop"
-                    tools:text="stop" />
+                    tools:text="stop"
+                    android:src="@drawable/redbutton_disable"
+                    android:scaleType="fitCenter"/>
 
-                <Button
+                <!--include layout="@layout/cw_button"
+                    android:id="@+id/button_run_cw"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/button_stop"
+                    android:text="turn cw"/-->
+
+                <ImageButton
                     android:id="@+id/button_run_cw"
                     android:layout_width="100dp"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
                     android:layout_toEndOf="@+id/button_stop"
                     android:text="turn cw"
-                    tools:text="turn cw" />
+                    android:src="@drawable/clockwise_disable"
+                    android:scaleType="fitCenter"/>
 
-                <Button
+                <!--Button
+                    android:id="@+id/button_run_cw"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentTop="true"
+                    android:layout_toEndOf="@+id/button_stop"
+                    android:text="turn cw"
+                    tools:text="turn cw" /-->
+
+                <ImageButton
                     android:id="@+id/button_run_ccw"
                     android:layout_width="100dp"
                     android:layout_height="match_parent"
                     android:layout_alignParentTop="true"
                     android:layout_toStartOf="@+id/button_stop"
                     android:text="turn ccw"
-                    tools:text="turn ccw" />
+                    tools:text="turn ccw"
+                    android:src="@drawable/anticlockwise_disable"
+                    android:scaleType="fitCenter"/>
 
             </RelativeLayout>
 

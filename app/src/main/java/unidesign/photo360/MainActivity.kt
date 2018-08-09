@@ -80,9 +80,9 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
 //    public lateinit var wifiManager: WifiManager
     //public lateinit var sharedPrefs: PreferenceManager
     var homeWiFiInfo: WifiInfo? = null
-    lateinit var btnRunCW: Button
-    lateinit var btnRunCCW: Button
-    lateinit var btnSTOP: Button
+    lateinit var btnRunCW: ImageButton
+    lateinit var btnRunCCW: ImageButton
+    lateinit var btnSTOP: ImageButton
     lateinit var framesLeftTxt: TextView
     lateinit var turntableView: TurntableView
     lateinit var mViewPager: ViewPager
@@ -156,16 +156,15 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         wifiConf =  WifiConfiguration()
         wifiManager = applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
 
-        val myToolbar = findViewById(R.id.main_activity_toolbar) as Toolbar
+        val myToolbar: Toolbar = findViewById(R.id.main_activity_toolbar)
         setSupportActionBar(myToolbar)
         // Get a support ActionBar corresponding to this toolbar
         val ab = supportActionBar
-        drawer = findViewById(R.id.drawer_layout) as DrawerLayout
 
-        val navigationView = findViewById(R.id.nav_view) as NavigationView
+        val navigationView: NavigationView = findViewById(R.id.nav_view)
         navigationView.setNavigationItemSelectedListener(this)
 
-        drawer = findViewById(R.id.drawer_layout) as DrawerLayout
+        drawer = findViewById(R.id.drawer_layout)
         val toggle = object : ActionBarDrawerToggle(
                 this, drawer, myToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close) {
             override fun onDrawerOpened(drawerView: View) {
@@ -194,7 +193,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         mViewPager = findViewById(R.id.view_pager)
         mViewPager.adapter = pageAdapter
 
-        var tabLayout = findViewById(R.id.tabs) as TabLayout
+        var tabLayout: TabLayout = findViewById(R.id.tabs)
         tabLayout.setupWithViewPager(mViewPager)
 
         mprogresBar = findViewById(R.id.progressBar)
@@ -317,7 +316,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     }*/
 
     override fun onBackPressed() {
-        val drawer = findViewById(R.id.drawer_layout) as DrawerLayout
+        val drawer: DrawerLayout = findViewById(R.id.drawer_layout)
         if (drawer.isDrawerOpen(GravityCompat.START)) run {
                 drawer.closeDrawer(GravityCompat.START)
             //mTutorialHandler.cleanUp();
@@ -441,6 +440,9 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         btnRunCW.isEnabled = false
         btnRunCCW.isEnabled = false
         btnSTOP.isEnabled = false
+        btnRunCW.setImageResource(R.drawable.clockwise_disable)
+        btnRunCCW.setImageResource(R.drawable.anticlockwise_disable)
+        btnSTOP.setImageResource(R.drawable.redbutton_disable)
     }
 
     private fun enableButton() {
@@ -448,6 +450,9 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         btnRunCW.isEnabled = true
         btnRunCCW.isEnabled = true
         btnSTOP.isEnabled = true
+        btnRunCW.setImageResource(R.drawable.clockwise)
+        btnRunCCW.setImageResource(R.drawable.anticlockwise)
+        btnSTOP.setImageResource(R.drawable.redbutton)
     }
 
     private fun buttonStartState() {
@@ -456,6 +461,9 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         btnRunCCW.isEnabled = true
         btnSTOP.isEnabled = false
         runningFragmentId = NO_FRAGMENT_RUNNING
+        btnRunCW.setImageResource(R.drawable.clockwise)
+        btnRunCCW.setImageResource(R.drawable.anticlockwise)
+        btnSTOP.setImageResource(R.drawable.redbutton_disable)
     }
 
     private fun buttonStopState() {
@@ -464,6 +472,9 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         btnRunCCW.isEnabled = false
         btnSTOP.isEnabled = true
         //runningFragmentId = NO_FRAGMENT_RUNNING
+        btnRunCW.setImageResource(R.drawable.clockwise_disable)
+        btnRunCCW.setImageResource(R.drawable.anticlockwise_disable)
+        btnSTOP.setImageResource(R.drawable.redbutton)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -507,7 +518,10 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             }
 
             R.id.action_settings -> {
-
+                if (btnRunCW.isEnabled )
+                    disableButton()
+                else
+                    enableButton()
                 return true
             }
 
