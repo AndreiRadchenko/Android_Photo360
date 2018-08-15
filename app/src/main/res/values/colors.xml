@@ -9,4 +9,5 @@
 <color name="colorPrimary">#548ab0</color>
 <color name="colorPrimaryDark">#386EBD</color>
 <color name="colorAccent">#ED1C24</color>
+<color name="colorProgress">#0616fc</color>
 </resources>

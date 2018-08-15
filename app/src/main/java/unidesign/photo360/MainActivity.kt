@@ -1,6 +1,7 @@
 package unidesign.photo360
 
 import android.Manifest
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.BroadcastReceiver
@@ -718,10 +719,43 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                     }
                 }
                 if (!TurntableFound){
-                    Toast.makeText(application, "Turntable WiFi not found", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(application, getString(R.string.turntable_not_found), Toast.LENGTH_SHORT).show()
                     menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connect))
                     mprogresBar.visibility = View.INVISIBLE
                 }
+            }
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSION_REQUEST_CODE -> {
+                // If request is cancelled, the result arrays are empty.
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    // permission was granted, yay! Do the
+                    // contacts-related task you need to do.
+
+                    Timer().schedule(object : TimerTask() {
+                        override fun run() {
+                            // EXECUTE ACTIONS (LIKE FRAGMENT TRANSACTION ETC.)
+                            val newFragment = BackupDialog()
+                            newFragment.show(supportFragmentManager, "backup_dialog")
+                        }
+                    }, 0)
+
+                } else {
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(application, getString(R.string.storage_denied), Toast.LENGTH_SHORT).show()
+                }
+                return
+            }
+
+            // Add other 'when' lines to check for other
+            // permissions this app might request.
+            else -> {
+                // Ignore all other requests.
             }
         }
     }

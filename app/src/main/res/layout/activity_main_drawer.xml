@@ -127,11 +127,16 @@
 
             <ProgressBar
                 android:id="@+id/progressBar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="96dp"
-                android:layout_gravity="center_vertical|center_horizontal"
-                android:layout_marginTop="50dp"
+
+                android:layout_height="30dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="-10dp"
+                android:indeterminate="true"
+                android:theme="@style/LinearProgress"
                 android:visibility="invisible" />
+
         </android.support.design.widget.CoordinatorLayout>
 
         <android.support.design.widget.NavigationView xmlns:android="http://schemas.android.com/apk/res/android"
