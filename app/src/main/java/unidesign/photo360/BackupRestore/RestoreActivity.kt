@@ -21,16 +21,12 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.nio.channels.FileChannel
 
-import java.util.*
-import android.content.SharedPreferences
-import android.support.v7.app.ActionBar
-import android.util.SparseBooleanArray
-import java.io.InputStream
+import unidesign.photo360.R
 
 import java.util.ArrayList
 import java.util.Collections
 import java.util.Comparator
-
+import kotlin.text.Charsets.UTF_8
 
 
 /**
@@ -41,16 +37,18 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
 
     private var recyclerView: RecyclerView? = null
     private var mLayoutManager: RecyclerView.LayoutManager? = null
-    var mAdapter: RestoreTemplateAdapter
+    lateinit var mAdapter: RestoreTemplateAdapter
     internal var values = ContentValues()
-    var listItems: MutableList<RestoreRecyclerItem> = ArrayList<E>()
+    var listItems: MutableList<RestoreRecyclerItem> = ArrayList<RestoreRecyclerItem>()
 
     internal var myFileArray: MutableList<String> = ArrayList()
     internal var BackupName = ""
-    internal var sdPath: File
+    lateinit internal var sdPath: File
     var mActionMode: ActionMode? = null
-    var AsyncRestore: RestoreTask
-    internal var myToolbar: Toolbar
+    lateinit var AsyncRestore: RestoreTask
+    lateinit internal var myToolbar: Toolbar
+
+    val DIR_SD: String = getString(R.string.app_name)
 
     /* Checks if external storage is available for read and write */
     val isExternalStorageWritable: Boolean
@@ -65,11 +63,11 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
 
         // Use the chosen theme
         val sharedPrefs = android.preference.PreferenceManager.getDefaultSharedPreferences(this)
-        val useDarkTheme = sharedPrefs.getBoolean(pref_items.pref_DarkTheme, false)
+/*        val useDarkTheme = sharedPrefs.getBoolean(pref_items.pref_DarkTheme, false)
 
         if (useDarkTheme) {
             setTheme(R.style.Theme_Dark)
-        }
+        }*/
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.restore_activity)
@@ -93,7 +91,7 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
         myFileArray.clear()
 
         sdPath = File(Environment.getExternalStorageDirectory().toString()
-                + File.separator + BackupTask.DIR_SD)
+                + File.separator + DIR_SD)
         if (!sdPath.exists()) {
             // ñîçäàåì êàòàëîã
             myFileArray.add("Nothing to restore")
@@ -102,7 +100,7 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
             val filesLength = files!!.size
             for (i in 0 until filesLength) {
                 val Backupitem = getBackup(files, files[i])
-                if (!Backupitem.getName().equals(""))
+                if (!Backupitem.name.equals(""))
                     listItems.add(Backupitem)
             }
         }
@@ -110,10 +108,11 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
         //Log.d(LOG_TAG, "initializeData(): "+ listItems.get(0).getTemplatename());
         val RA = this
 
-        Collections.sort(listItems, Comparator<Any> { obj1, obj2 -> obj1.getName().compareToIgnoreCase(obj2.getName()) })
+        Collections.sort(listItems, Comparator<RestoreRecyclerItem>
+                { obj1, obj2 -> obj1.name.toString().compareTo(obj2.name.toString(), true) })
 
-        mAdapter = RestoreTemplateAdapter(this, listItems, object : RestoreTemplateAdapter.OnItemClickListener() {
-            fun onItemClick(item: RestoreRecyclerItem) {
+        mAdapter = RestoreTemplateAdapter(this, listItems, object : RestoreTemplateAdapter.OnItemClickListener {
+            override fun onItemClick(item: RestoreRecyclerItem) {
                 try {
                     AsyncRestore = RestoreTask(applicationContext, RA)
 
@@ -155,45 +154,21 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
     }
 
     internal fun getBackup(files: Array<String>, file: String): RestoreRecyclerItem {
-        val mBackup = RestoreRecyclerItem("", "", "", "")
+        val mBackup = RestoreRecyclerItem("", "", "")
 
         var delims = "[_.]"
         var tokens = file.split(delims.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-        if (tokens.size == 5) {
 
-            if (tokens[0] == "SMS") {
-                //Log.d("RestoreDialog: ", "tokens[0] = " + tokens[0]);
-                return mBackup
-            } else {
-                // Log.d("RestoreDialog: ", "tokens[0] = " + tokens[0]);
-                delims = "[-]"
-                val time = tokens[3].split(delims.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                val backupName = tokens[2] + " " + time[0] + ":" + time[1]
-                mBackup.setName(backupName)
-                mBackup.setUSSD_file_path(sdPath.toString() + File.separator + file)
-                val json = loadJSONFromFile(sdPath.toString() + File.separator + file)
+        val json = loadJSONFromFile(sdPath.toString() + File.separator + file)
 
-                try {
-                    val obj = JSONObject(json)
-                    mBackup.setComment(obj.getString("comment"))
+        try {
+            val obj = JSONObject(json)
+            mBackup.comment = obj.getString("comment")
+            mBackup.name = obj.getString("filename")
 
-                } catch (e: JSONException) {
+            } catch (e: JSONException) {
                     e.printStackTrace()
-                }
-
-                val filesLength = files.size
-                for (i in 0 until filesLength) {
-                    delims = "[_.]"
-                    tokens = files[i].split(delims.toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                    if (tokens[0] == "SMS") {
-                        val StringForCompare = files[i].replace("SMS", "USSD")
-                        if (file == StringForCompare) {
-                            mBackup.setSMS_file_path(sdPath.toString() + File.separator + files[i])
-                        }
-                    }
-                }
             }
-        }
 
         return mBackup
     }
@@ -201,12 +176,12 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
     fun loadJSONFromFile(sourceFile: String): String? {
         var json: String? = null
         try {
-            val `is` = FileInputStream(sourceFile)
-            val size = `is`.available()
+            val inpStream = FileInputStream(sourceFile)
+            val size = inpStream.available()
             val buffer = ByteArray(size)
-            `is`.read(buffer)
-            `is`.close()
-            json = String(buffer, "UTF-8")
+            inpStream.read(buffer)
+            inpStream.close()
+            json = String(buffer, UTF_8)
         } catch (ex: IOException) {
             ex.printStackTrace()
             return null
