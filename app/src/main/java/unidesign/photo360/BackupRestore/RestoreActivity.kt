@@ -121,20 +121,9 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
                 }
 
                 AsyncRestore.execute(item)
-                // copy icon dir from external storage to application dir
-                var appIconPath = applicationContext.filesDir
-                appIconPath = File(appIconPath.path)
-                if (!appIconPath.exists()) {
-                    appIconPath.mkdirs()
-                }
-                val backup_icons_dir = sdPath.path + "/" + "icons"
-                copyFileOrDirectory(backup_icons_dir, appIconPath.path)
             }
         })
 
-        val swipeAndDragHelper = RestoreSwipeAndDragHelper(mAdapter)
-        val touchHelper = ItemTouchHelper(swipeAndDragHelper)
-        //mAdapter.setTouchHelper(touchHelper);
         recyclerView!!.adapter = mAdapter
         //touchHelper.attachToRecyclerView(recyclerView);
         implementRecyclerViewClickListeners()
@@ -192,15 +181,15 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
 
     //Implement item click and long click over recycler view
     private fun implementRecyclerViewClickListeners() {
-        recyclerView!!.addOnItemTouchListener(RecyclerTouchListener(this, recyclerView,
-                object : RecyclerClick_Listener() {
-                    fun onClick(view: View, position: Int) {
+        recyclerView!!.addOnItemTouchListener(RecyclerTouchListener(this, recyclerView!!,
+                object : RecyclerClick_Listener {
+                    override fun onClick(view: View, position: Int) {
                         //If ActionMode not null select item
                         if (mActionMode != null)
                             onListItemSelect(position)
                     }
 
-                    fun onLongClick(view: View, position: Int) {
+                    override fun onLongClick(view: View, position: Int) {
                         //Select item on long click
                         onListItemSelect(position)
                     }

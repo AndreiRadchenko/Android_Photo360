@@ -26,12 +26,7 @@ class RestoreTemplateAdapter(internal var context: Context, mlistItems: MutableL
     var listItems: MutableList<RestoreRecyclerItem> = ArrayList<RestoreRecyclerItem>()
     private var touchHelper: ItemTouchHelper? = null
     //Return all selected ids
-    var selectedIds: SparseBooleanArray? = null
-        private set
-
-    //Get total selected count
-    val selectedCount: Int
-        get() = selectedIds!!.size()
+    private var mSelectedItemsIds: SparseBooleanArray? = null
 
     interface OnItemClickListener {
         fun onItemClick(item: RestoreRecyclerItem)
@@ -40,7 +35,7 @@ class RestoreTemplateAdapter(internal var context: Context, mlistItems: MutableL
     init {
         //setHasStableIds(true); // this is required for D&D feature.
         this.listItems = mlistItems
-        selectedIds = SparseBooleanArray()
+        mSelectedItemsIds = SparseBooleanArray()
     }
 
 
@@ -64,7 +59,7 @@ class RestoreTemplateAdapter(internal var context: Context, mlistItems: MutableL
         //                .setBackgroundColor(mSelectedItemsIds.get(position) ? 0x9934B5E4
         //                        : Color.TRANSPARENT);
         holder.restore_item_container.setBackgroundColor(
-                if (selectedIds!!.get(position))
+                if (mSelectedItemsIds!!.get(position))
                     context.resources.getColor(R.color.bg_item_selected_state)
                 else
                     context.resources.getColor(R.color.bg_item_normal_state)
@@ -124,13 +119,13 @@ class RestoreTemplateAdapter(internal var context: Context, mlistItems: MutableL
 
     //Toggle selection methods
     fun toggleSelection(position: Int) {
-        selectView(position, !selectedIds!!.get(position))
+        selectView(position, !mSelectedItemsIds!!.get(position))
     }
 
 
     //Remove selected selections
     fun removeSelection() {
-        selectedIds = SparseBooleanArray()
+        mSelectedItemsIds = SparseBooleanArray()
         notifyDataSetChanged()
     }
 
@@ -138,20 +133,30 @@ class RestoreTemplateAdapter(internal var context: Context, mlistItems: MutableL
     //Put or delete selected position into SparseBooleanArray
     fun selectView(position: Int, value: Boolean) {
         if (value)
-            selectedIds!!.put(position, value)
+            mSelectedItemsIds!!.put(position, value)
         else
-            selectedIds!!.delete(position)
+            mSelectedItemsIds!!.delete(position)
 
         notifyDataSetChanged()
     }
 
     fun selectAllView(listSize: Int, value: Boolean) {
-        selectedIds = SparseBooleanArray()
+        mSelectedItemsIds = SparseBooleanArray()
         if (value) {
             for (i in 0 until listSize)
-                selectedIds!!.put(i, value)
+                mSelectedItemsIds!!.put(i, value)
         }
         notifyDataSetChanged()
+    }
+
+    //Get total selected count
+    fun getSelectedCount(): Int {
+        return mSelectedItemsIds!!.size()
+    }
+
+    //Return all selected ids
+    fun getSelectedIds(): SparseBooleanArray? {
+        return mSelectedItemsIds
     }
 
 }
