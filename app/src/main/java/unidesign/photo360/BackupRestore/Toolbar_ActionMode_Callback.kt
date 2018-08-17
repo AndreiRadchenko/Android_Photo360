@@ -6,6 +6,7 @@ import android.support.v7.view.ActionMode
 import android.util.SparseBooleanArray
 import android.view.Menu
 import android.view.MenuItem
+import unidesign.photo360.R
 
 class Toolbar_ActionMode_Callback(private val context: Context, private val recyclerView_adapter: RestoreTemplateAdapter,
                                   private val message_models: List<RestoreRecyclerItem>, private val isListViewFragment: Boolean) : ActionMode.Callback {
@@ -30,16 +31,16 @@ class Toolbar_ActionMode_Callback(private val context: Context, private val recy
             R.id.restore_action_select_all -> {
                 //Get selected ids on basis of current fragment action mode
                 val selected: SparseBooleanArray
-                selected = recyclerView_adapter.getSelectedIds()
+                selected = recyclerView_adapter.getSelectedIds()!!
 
                 if (selected.size() < message_models.size) {
                     recyclerView_adapter.selectAllView(message_models.size, true)
                     //set action mode title on item selection
-                    (context as RestoreActivity).mActionMode.setTitle(String.valueOf(recyclerView_adapter
-                            .getSelectedCount()) + " selected")
+                    (context as RestoreActivity).mActionMode!!.setTitle(recyclerView_adapter
+                            .getSelectedCount().toString() + " selected")
                 } else {
                     recyclerView_adapter.removeSelection()
-                    (context as RestoreActivity).mActionMode.finish()
+                    (context as RestoreActivity).mActionMode!!.finish()
                     //                    ((RestoreActivity) context).mActionMode.setTitle(String.valueOf(recyclerView_adapter
                     //                        .getSelectedCount()) + " selected");
                 }
@@ -64,7 +65,7 @@ class Toolbar_ActionMode_Callback(private val context: Context, private val recy
             //            anim.setDuration(250).start();
             val anim = StatusbarColorAnimator(context,
                     context.getResources().getColor(R.color.select_mod_status_bar),
-                    RN_USSD.toolbar_color)
+                    context.getResources().getColor(R.color.colorPrimaryDark))
             anim.setDuration(250).start()
         }
     }

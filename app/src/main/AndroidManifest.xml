@@ -61,6 +61,25 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".BackupRestore.RestoreActivity"
+            android:label="@string/restore_activity_form"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden">
+
+            <!-- Parent activity meta-data to support 4.0 and lower -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="unidesign.photo360.MainActivity" />
+
+            <intent-filter>
+                <action android:name="intent.action.restore_templates" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

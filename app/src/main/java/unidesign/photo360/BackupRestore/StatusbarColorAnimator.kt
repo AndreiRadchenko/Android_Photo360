@@ -10,13 +10,14 @@ import android.view.Window
  * Created by United on 12/28/2017.
  */
 
-class StatusbarColorAnimator(context: Context, internal var statusBarColor: Int, internal var statusBarToColor: Int) : ValueAnimator(), ValueAnimator.AnimatorUpdateListener {
+class StatusbarColorAnimator(context: Context, internal var statusBarColor: Int,
+                             internal var statusBarToColor: Int) : ValueAnimator(), ValueAnimator.AnimatorUpdateListener {
 
     internal var context: Context? = null
     internal var window: Window
 
     init {
-        this.setFloatValues(0, 1)
+        this.setFloatValues(0f, 1f)
         this.addUpdateListener(this)
         window = (context as RestoreActivity).window
     }//context.getResources().getColor(R.color.select_mod_status_bar);

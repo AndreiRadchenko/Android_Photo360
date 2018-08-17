@@ -9,7 +9,6 @@ import android.support.v7.view.ActionMode
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -48,7 +47,9 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
     lateinit var AsyncRestore: RestoreTask
     lateinit internal var myToolbar: Toolbar
 
-    val DIR_SD: String = getString(R.string.app_name)
+    //val DIR_SD: String = getString(R.string.app_name)
+    val DIR_SD: String = "Photo360s"
+    //val DIR_SD: String = getString(R.string.app_name)
 
     /* Checks if external storage is available for read and write */
     val isExternalStorageWritable: Boolean
@@ -215,7 +216,7 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
                 //                        getResources().getColor(R.color.select_mod_status_bar));
                 //                anim.setDuration(250).start();
                 val anim = StatusbarColorAnimator(this,
-                        RN_USSD.toolbar_color,
+                        resources.getColor(R.color.colorPrimary),
                         resources.getColor(R.color.select_mod_status_bar))
                 anim.setDuration(250).start()
             }
@@ -227,8 +228,8 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
 
         if (mActionMode != null)
         //set action mode title on item selection
-            mActionMode!!.title = getString(R.string.restore_select_title) + " " + String.valueOf(mAdapter
-                    .getSelectedCount())
+            mActionMode!!.title = getString(R.string.restore_select_title) + " " + mAdapter
+                    .getSelectedCount()
 
 
     }
@@ -242,19 +243,16 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
     fun deleteRows() {
         val selected = mAdapter
                 .getSelectedIds()//Get selected ids
-        var sms_file: File
-        var ussd_file: File
+        var file4delete: File
 
         //Loop all selected ids
-        for (i in selected.size() - 1 downTo 0) {
+        for (i in selected!!.size() - 1 downTo 0) {
             if (selected.valueAt(i)) {
                 //If current id is selected remove the item via key
-                sms_file = File(listItems[selected.keyAt(i)].getSMS_file_path())
-                ussd_file = File(listItems[selected.keyAt(i)].getUSSD_file_path())
-                if (ussd_file.exists())
-                    ussd_file.delete()
-                if (sms_file.exists())
-                    sms_file.delete()
+                file4delete = File(listItems[selected.keyAt(i)].filepath)
+
+                if (file4delete.exists())
+                    file4delete.delete()
                 //                deleteFile(listItems.get(selected.keyAt(i)).getSMS_file_path());
                 //                deleteFile(listItems.get(selected.keyAt(i)).getUSSD_file_path());
                 listItems.removeAt(selected.keyAt(i))
@@ -269,7 +267,7 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
 
     }
 
-    fun processFinish(backup_name: String) {
+    override fun processFinish(backup_name: String) {
         val greetingText = String.format(resources.getString(R.string.BackupRestoredMessage), backup_name)
         Toast.makeText(this, greetingText, Toast.LENGTH_LONG).show()
 

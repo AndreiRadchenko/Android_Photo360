@@ -41,6 +41,19 @@
     <string name="callibration_speed">Callibration speed</string>
     <string name="turntable_not_found">Turntable WiFi not found</string>
     <string name="storage_denied">Permission to storage denied</string>
+    <string name="select_all">Select all</string>
+    <string name="delete_selection">delete selection</string>
+    <string name="action_selection_settings">settings</string>
+    <string name="restore_select_title">selected</string>
+
+    <string name="BackupRestoredMessage">Backup %1$s restored</string>
+    <string name="restore_activity_form">Restore backup</string>
+    <string name="ext_stor_perm_denied">Permission Denied, You cannot access External storage.</string>
+
+    <plurals name="Deleted_backup_message">
+        <item quantity="one">Deleted %1$d backup</item>
+        <item quantity="other">Deleted %1$d backups</item>
+    </plurals>
 
     <string-array name="shootingmode_array">
         <item>Interval</item>

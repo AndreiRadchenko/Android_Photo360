@@ -95,6 +95,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     //represents a common pool of shared threads as the coroutine dispatcher
     private val bgContext: CoroutineContext = CommonPool
     internal val PERMISSION_REQUEST_CODE = 1
+    val PERMISSION_READ_SD = 2
     //private var runningFragmentId: Int = NO_FRAGMENT_RUNNING
     //var postSettings: Settings = Settings()
     //public val sharedPrefs = PreferenceManager(applicationContext)
@@ -404,13 +405,13 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             }
         } else if (id == R.id.nav_restore) {
 
-/*            if (ContextCompat.checkSelfPermission(this,
+            if (ContextCompat.checkSelfPermission(this,
                             Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
                 startActivity(Intent("intent.action.restore_templates"))
             } else {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_READ_SD)
-            }*/
+            }
         } else if (id == R.id.nav_help) {
 
 /*            val settings_intent = Intent(this, SettingsPrefActivity::class.java)
@@ -751,6 +752,16 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                 }
                 return
             }
+            PERMISSION_READ_SD -> {
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+                    startActivity(Intent("intent.action.restore_templates"))
+                }
+                else {
+                    //                    Snackbar.make(tabLayout, getResources().getString(R.string.ext_stor_perm_denied),
+                    //                            Snackbar.LENGTH_LONG).show();
+                    Toast.makeText(this, R.string.ext_stor_perm_denied, Toast.LENGTH_LONG).show()
+                }}
 
             // Add other 'when' lines to check for other
             // permissions this app might request.
