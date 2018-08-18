@@ -9,6 +9,7 @@ import android.support.v7.view.ActionMode
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -48,7 +49,7 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
     lateinit internal var myToolbar: Toolbar
 
     //val DIR_SD: String = getString(R.string.app_name)
-    val DIR_SD: String = "Photo360s"
+    val DIR_SD: String = "Photo360"
     //val DIR_SD: String = getString(R.string.app_name)
 
     /* Checks if external storage is available for read and write */
@@ -120,8 +121,9 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
                 } catch (e: Exception) {
                     throw RuntimeException(e)
                 }
-
-                AsyncRestore.execute(item)
+//                Log.d("OnItemClickListener","OnItemClickListener item = " + item)
+//                Log.d("OnItemClickListener","OnItemClickListener item.filepath = " + item.filepath)
+                AsyncRestore.execute(item.filepath)
             }
         })
 
@@ -155,6 +157,7 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
             val obj = JSONObject(json)
             mBackup.comment = obj.getString("comment")
             mBackup.name = obj.getString("filename")
+            mBackup.filepath = sdPath.toString() + File.separator + file
 
             } catch (e: JSONException) {
                     e.printStackTrace()
@@ -188,6 +191,7 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
                         //If ActionMode not null select item
                         if (mActionMode != null)
                             onListItemSelect(position)
+                        Log.d("RecyclerClick_Listener","RecyclerClick_Listener")
                     }
 
                     override fun onLongClick(view: View, position: Int) {

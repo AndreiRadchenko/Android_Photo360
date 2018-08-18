@@ -74,7 +74,7 @@
                 android:value="unidesign.photo360.MainActivity" />
 
             <intent-filter>
-                <action android:name="intent.action.restore_templates" />
+                <action android:name="intent.action.restore_photo360" />
 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

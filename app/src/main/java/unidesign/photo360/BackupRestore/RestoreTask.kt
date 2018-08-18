@@ -4,6 +4,7 @@ import android.app.ProgressDialog
 import android.content.ContentValues
 import android.content.Context
 import android.os.AsyncTask
+import android.util.Log
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -18,7 +19,7 @@ import java.io.InputStreamReader
  * Created by United on 12/29/2017.
  */
 
-class RestoreTask(private val mContext: Context, var RA: RestoreActivity) : AsyncTask<RestoreRecyclerItem, Void, String>() {
+class RestoreTask(private val mContext: Context, var RA: RestoreActivity) : AsyncTask<String, Void, String>() {
 
     var pDialog: ProgressDialog? = null
     var settingsPrefs = SettingsPreferences(mContext)
@@ -51,15 +52,17 @@ class RestoreTask(private val mContext: Context, var RA: RestoreActivity) : Asyn
         pDialog.show();*/
     }
 
-    override fun doInBackground(vararg params: RestoreRecyclerItem): String {
+    override fun doInBackground(vararg params: String): String {
 
-        val item = params[0]
+        val filepath = params[0]
         //        Log.d(LOG_TAG, "-- ImageName --" + ImageName);
         // получаем данные с карты памяти
-        val RestoreJson = getStringFromFile(item.filepath.toString())
+        Log.d("RestoreTask", "item.filepath $filepath" )
+        var RestoreJson = getStringFromFile(filepath)
+
         restoreJSON2settingsPref(RestoreJson)
 
-        return item.name.toString()
+        return filepath
     }
 
     override fun onPostExecute(strJson: String) {
@@ -86,6 +89,7 @@ class RestoreTask(private val mContext: Context, var RA: RestoreActivity) : Asyn
                     line = buffreader.readLine()
                     while (line != null) {
                         line1 += line
+                        Log.d("getStringFromFile", "line1 = " + line1)
                         line = buffreader.readLine()
                     }
                 } catch (e: Exception) {
@@ -113,6 +117,7 @@ class RestoreTask(private val mContext: Context, var RA: RestoreActivity) : Asyn
         val values = ContentValues()
 
         try {
+            Log.d("restorJSON2settingsPref", "jsonstr $jsonstr")
             dataJsonObj = JSONObject(jsonstr)
             presetArray = dataJsonObj.getJSONArray("presets")
             //Log.d(LOG_TAG, "onPostExecute, data_fild: "+ data_fild);

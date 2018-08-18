@@ -408,7 +408,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             if (ContextCompat.checkSelfPermission(this,
                             Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
-                startActivity(Intent("intent.action.restore_templates"))
+                startActivity(Intent("intent.action.restore_photo360"))
             } else {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_READ_SD)
             }
