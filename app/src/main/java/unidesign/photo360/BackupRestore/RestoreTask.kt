@@ -117,7 +117,7 @@ class RestoreTask(private val mContext: Context, var RA: RestoreActivity) : Asyn
         val values = ContentValues()
 
         try {
-            Log.d("restorJSON2settingsPref", "jsonstr $jsonstr")
+            //Log.d("restorJSON2settingsPref", "jsonstr $jsonstr")
             dataJsonObj = JSONObject(jsonstr)
             presetArray = dataJsonObj.getJSONArray("presets")
             //Log.d(LOG_TAG, "onPostExecute, data_fild: "+ data_fild);
@@ -127,7 +127,8 @@ class RestoreTask(private val mContext: Context, var RA: RestoreActivity) : Asyn
 
                 try {
                     tableObject = presetArray.getJSONObject(i)
-                    settingsPrefs.presetArray[i].set(tableObject.toString())
+                    Log.d("restorJSON2settingsPref", "tableObject = " + tableObject.getString("preset$i"))
+                    settingsPrefs.presetArray[i].set(tableObject.getString("preset$i"))
                 } catch (e: JSONException) {
                     e.printStackTrace()
                 }

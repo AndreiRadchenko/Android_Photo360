@@ -10,11 +10,13 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import org.json.JSONException
 import org.json.JSONObject
+import unidesign.photo360.MainActivity
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -212,7 +214,7 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
             // there are some selected items, start the actionMode
             mActionMode = startSupportActionMode(Toolbar_ActionMode_Callback(this,
                     mAdapter, listItems, false))
-            //myToolbar.setVisibility(View.INVISIBLE);
+            //myToolbar.setVisibility(View.GONE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 //                StatusbarColorAnimator anim = new StatusbarColorAnimator(this,
@@ -272,6 +274,7 @@ class RestoreActivity : AppCompatActivity(), RestoreTask.AsyncResponse {
     }
 
     override fun processFinish(backup_name: String) {
+        MainActivity.drawer.closeDrawer(Gravity.LEFT, false)
         val greetingText = String.format(resources.getString(R.string.BackupRestoredMessage), backup_name)
         Toast.makeText(this, greetingText, Toast.LENGTH_LONG).show()
 

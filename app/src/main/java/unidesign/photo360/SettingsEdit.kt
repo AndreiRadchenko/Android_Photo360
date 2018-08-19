@@ -167,6 +167,10 @@ class SettingsEdit : AppCompatActivity() {
                 finish()
                 return true
             }
+            android.R.id.home -> {
+                onBackPressed()
+                return true
+            }
             else ->
                 // If we got here, the user's action was not recognized.
                 // Invoke the superclass to handle it.

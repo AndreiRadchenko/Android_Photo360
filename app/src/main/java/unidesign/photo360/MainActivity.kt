@@ -1,7 +1,6 @@
 package unidesign.photo360
 
 import android.Manifest
-import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.content.BroadcastReceiver
@@ -9,20 +8,15 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.net.wifi.ScanResult
 import android.net.wifi.WifiConfiguration
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import kotlinx.android.synthetic.main.activity_main.*
 import android.os.Build
 import android.os.Handler
-import android.os.Message
 import android.support.annotation.RequiresApi
-import android.support.annotation.UiThread
-import android.support.design.R.id.visible
 import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
 import android.support.v4.app.ActivityCompat
@@ -40,7 +34,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import kotlinx.android.synthetic.main.fragment_page.*
 import kotlinx.coroutines.experimental.*
 //import com.sun.org.apache.xml.internal.serializer.utils.Utils.messages
 import org.java_websocket.WebSocket
@@ -50,7 +43,6 @@ import org.java_websocket.handshake.ServerHandshake
 import java.net.URI
 import java.net.URISyntaxException
 import org.java_websocket.drafts.Draft_6455
-import org.java_websocket.exceptions.WebsocketNotConnectedException
 import org.json.JSONObject
 import kotlin.coroutines.experimental.CoroutineContext
 import kotlinx.coroutines.experimental.android.UI
@@ -59,14 +51,11 @@ import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import unidesign.photo360.BackupRestore.BackupDialog
 import unidesign.photo360.BackupRestore.BackupTask
-import unidesign.photo360.R.drawable.settings
 import java.lang.Runnable
 
 //import unidesign.photo360.save_restore.BackupDialog
 
-import java.text.SimpleDateFormat
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 
 class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelectedListener,
@@ -90,12 +79,13 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     lateinit var mToolbar: Toolbar
     lateinit var pageAdapter: PageAdapter
     lateinit var TurntableConectionJob: Job
-    lateinit var drawer: DrawerLayout
+
     private lateinit var wifiScanReceiver: BroadcastReceiver
     //represents a common pool of shared threads as the coroutine dispatcher
     private val bgContext: CoroutineContext = CommonPool
-    internal val PERMISSION_REQUEST_CODE = 1
+    internal val PERMISSION_WRITE_SD = 1
     val PERMISSION_READ_SD = 2
+    val PERMISSION_WIFI = 3
     //private var runningFragmentId: Int = NO_FRAGMENT_RUNNING
     //var postSettings: Settings = Settings()
     //public val sharedPrefs = PreferenceManager(applicationContext)
@@ -113,6 +103,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         var wsConnected = false
         var mWebSocketClient: WebSocketClient? = null
         var menu: Menu? = null
+        lateinit var drawer: DrawerLayout
 
     }
 
@@ -287,6 +278,13 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
 //            runningFragmentId = NO_FRAGMENT_RUNNING
         })
 
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            if(checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
+            {
+                requestPermissions(Array<String>(1){Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_WIFI);
+            }
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -343,13 +341,13 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         Log.d("onResume()", "currentFragmentId: " + currentFragmentId)*/
             mViewPager.currentItem = runningFragmentId
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+ /*       if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
             if(checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
             {
-                requestPermissions(Array<String>(1){Manifest.permission.ACCESS_COARSE_LOCATION}, 87);
+                requestPermissions(Array<String>(1){Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_WIFI);
             }
-        }
+        }*/
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -401,7 +399,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                 AsyncBackup.execute();*/
             } else {
                 ActivityCompat.requestPermissions(this,
-                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_REQUEST_CODE)
+                        arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), PERMISSION_WRITE_SD)
             }
         } else if (id == R.id.nav_restore) {
 
@@ -409,6 +407,8 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                             Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
 
                 startActivity(Intent("intent.action.restore_photo360"))
+                //drawer.closeDrawer(Gravity.LEFT, false)
+
             } else {
                 ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), PERMISSION_READ_SD)
             }
@@ -731,7 +731,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     override fun onRequestPermissionsResult(requestCode: Int,
                                             permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
-            PERMISSION_REQUEST_CODE -> {
+            PERMISSION_WRITE_SD -> {
                 // If request is cancelled, the result arrays are empty.
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     // permission was granted, yay! Do the
@@ -755,12 +755,22 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             PERMISSION_READ_SD -> {
                 if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
                 {
-                    startActivity(Intent("intent.action.restore_templates"))
+                    startActivity(Intent("intent.action.restore_photo360"))
                 }
                 else {
                     //                    Snackbar.make(tabLayout, getResources().getString(R.string.ext_stor_perm_denied),
                     //                            Snackbar.LENGTH_LONG).show();
                     Toast.makeText(this, R.string.ext_stor_perm_denied, Toast.LENGTH_LONG).show()
+                }}
+            PERMISSION_WIFI -> {
+                if (grantResults.size > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                {
+
+                }
+                else {
+                    //                    Snackbar.make(tabLayout, getResources().getString(R.string.ext_stor_perm_denied),
+                    //                            Snackbar.LENGTH_LONG).show();
+                    Toast.makeText(this, "Permission to scan WiFi denied", Toast.LENGTH_LONG).show()
                 }}
 
             // Add other 'when' lines to check for other
