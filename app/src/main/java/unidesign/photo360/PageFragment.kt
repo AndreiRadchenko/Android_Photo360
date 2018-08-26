@@ -33,10 +33,12 @@ class PageFragment : Fragment() {
     lateinit var valueAnimator: ValueAnimator
     var page: Int = 0
     lateinit var viewModel: FragmentViewModel
+    lateinit var modeArray: Array<String>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_page, container, false)
         page = arguments!!.getInt(PAGE_NUM)
+        modeArray = resources.getStringArray(R.array.shootingmode_array)
 
         frames_txt = view.findViewById(R.id.frames_left_txt)
         preset_name_txt = view.findViewById(R.id.preset_name)
@@ -120,7 +122,10 @@ class PageFragment : Fragment() {
         param1_txt.text = mSettings.frame.toString()
         param2_txt.text = mSettings.delay.toString()
         param3_txt.text = mSettings.speed.toString()
-        param4_txt.text = mSettings.acceleration.toString()
+        when (mSettings.shootingMode) {
+            "inter" -> param4_txt.text = modeArray[0]
+            "nonST" -> param4_txt.text = modeArray[1]
+        }
         frames_txt.text = mSettings.framesLeft.toString()
 
         var prevAnimValue: Float

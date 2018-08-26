@@ -49,6 +49,7 @@
     <string name="BackupRestoredMessage">Backup %1$s restored</string>
     <string name="restore_activity_form">Restore backup</string>
     <string name="ext_stor_perm_denied">Permission Denied, You cannot access External storage.</string>
+    <string name="mode">Mode</string>
 
     <plurals name="Deleted_backup_message">
         <item quantity="one">Deleted %1$d backup</item>
@@ -57,8 +58,13 @@
 
     <string-array name="shootingmode_array">
         <item>Interval</item>
+        <item>Non stop</item>
+    </string-array>
+
+    <!--string-array name="shootingmode_array">
+        <item>Interval</item>
         <item>Ping-Pong</item>
         <item>Seria</item>
         <item>Non stop</item>
-    </string-array>
+    </string-array-->
 </resources>
