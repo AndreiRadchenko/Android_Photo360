@@ -10,6 +10,7 @@ import unidesign.photo360.R
 
 class Toolbar_ActionMode_Callback(private val context: Context, private val recyclerView_adapter: RestoreTemplateAdapter,
                                   private val message_models: List<RestoreRecyclerItem>, private val isListViewFragment: Boolean) : ActionMode.Callback {
+
     override fun onCreateActionMode(mode: ActionMode, menu: Menu): Boolean {
         mode.menuInflater.inflate(R.menu.menu_restore_actoinmod, menu)         //Inflate the menu over action mode
         return true
