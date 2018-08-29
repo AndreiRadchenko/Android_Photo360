@@ -29,8 +29,14 @@
     <string name="motors_steps_per_circle">Motors steps per circle</string>
     <string name="start_calibrate_btn">Calibrate</string>
     <string name="stop_calibrate_btn">Stop</string>
-    <string name="sam_explanation">Sam explanation of calibration process</string>
+
+    <!--string name="sam_explanation">Sam explanation of calibration process</string-->
+    <string name="sam_explanation">Калибровка. \n1) Задайте скорость вращения двигателя в процессе калибровки. \n2) Установите метку напротив вала двигателя. \n3) Нажмите кнопку "калибровка"
+\n4) Подождите пока метка совершит полный круг и снова окажется напротив вала двигателя. Нажмите "стоп". \nВ случае необходимости отредактируйте значение.
+</string>
+
     <string name="comment">Comment</string>
+    <string name="too_fast_rotation">Rotation to fast for non stop mode. Please, decrees speed or frames number</string>
     <string name="backup_name">Backup name</string>
     <string name="backupDialogTitle">Backup turntable settings</string>
     <string name="no_sdcard">External SD card is inaccessible</string>

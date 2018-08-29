@@ -119,6 +119,7 @@ class PresetEdit : AppCompatActivity() {
                     0 -> {
                     }
                     1 -> {
+                        chekNonStopMode()
                     }
                     2 -> {
                     }
@@ -158,6 +159,9 @@ class PresetEdit : AppCompatActivity() {
         // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
             R.id.action_save -> {
+                if (!chekNonStopMode())
+                    return true
+
                 oldSet = viewModel.getPreset().value!!
 /*                when (page) {
                     0 -> oldSet = Settings(viewModel.getPreset1().value!!)
@@ -193,5 +197,25 @@ class PresetEdit : AppCompatActivity() {
             }
         }
         return null
+    }
+
+    fun chekNonStopMode(): Boolean {
+        if (etShootingMode.selectedItemPosition == 1) {
+            //etShootingMode.selectedItemId
+            var frames = etFrame.text.toString().toFloat()
+            var speed = etSpeed.text.toString().toFloat()
+            var oldSet = viewModel.getPreset().value!!
+            var allstep = oldSet.allSteps.toFloat()
+            //var shootinterval: Float = (allstep / frames / speed) * 1000
+            var shootinterval: Float = (allstep / frames / speed) * 1000
+            if (shootinterval < 300) {
+                etShootingMode.setSelection(0)
+                Toast.makeText(application, "Shooting interval " + shootinterval + " ms", Toast.LENGTH_LONG).show()
+                Toast.makeText(application, R.string.too_fast_rotation, Toast.LENGTH_LONG).show()
+                return false
+            }
+        }
+
+        return true
     }
 }
