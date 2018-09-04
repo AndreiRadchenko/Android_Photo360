@@ -414,9 +414,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             }
         } else if (id == R.id.nav_help) {
 
-/*            val settings_intent = Intent(this, SettingsPrefActivity::class.java)
-            startActivity(settings_intent)
-            //startActivity(new Intent("intent.action.settings"));*/
+            startActivity(Intent("intent.action.photo360_help"))
         }
 
         //        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

@@ -1,0 +1,60 @@
+- Application aim
+- Connection to the turntable
+- Presets
+- Calibration
+- Backup turntable settings to the file
+
+Application aim
+    The application is intended for use with a Photo360 turntable (https://www.3dprint.com.ua).
+    The main screen contains four tabs of presets and buttons for start and stop.
+    Control is carried out through a WiFi network, the access point is the turntable  itself.
+
+Connection to the turntable
+    Turn on turntable. When firmware is loading, the serial number of the device is displayed on 
+    the control panel screen, look like Photo360_AP001. It can also be found in the turntable menu,
+    on the second page of settings, using the IR remote control. 
+    Launch the Photo360 app on your smartphone. Open the sidebar and click "Settings."
+    In the WiFi SSID field, enter the serial number of the platform. In the "password" field, enter the same 
+    serial number. Save the settings by clicking the icon in the toolbar.
+    In the application toolbar, click on connection icon. The application will scan available WiFi networks
+    and will automatically connect the phone to the turntable WiFi network. If connection is successful, 
+    the icon view is changes and start buttons become active.
+
+Presets
+    The application contains four tabs of presets. Click the gear icon to edit preset. In the preset edit 
+    window, you can set the number of frames per full turntable rotation, the shutter delay
+    after the next move, the speed of the motor and the rotation mode.
+    Currently two modes available - turn-by-turn 360 degrees with shooting intervals, and 360 degree rotation
+    without stopping with shooting in motion - video shooting mode.
+    To save changes to the preset, click the icon "" in the toolbar. 
+    Control buttons launch the displayed preset.
+
+Calibration
+    Calibration is the determination of the engine steps number, required for turntable 
+    full rotation. The number of steps per circle depends on the diameter of the rotary platform and the 
+    diameter of the driving shaft of the engine and is determined for each platform individually.
+    Calibration performed when the phone is connected to the turntable (link to the connection) (button
+    "calibration" active)
+    Calibration procedure.
+     1) Open the sidebar and click "settings."
+     2) In the "calibration speed" field, set the speed of the engine during calibration process
+        (the default value is set to 300 steps per second).
+     3) Set the label in front of the engine shaft. A label can be any item or dot marker on the platform 
+        edge in front of the engine shaft.
+     4) Click the "calibration" button.
+     5) Wait for the label make a full turn and again will be in front of the engine shaft. Press "stop". 
+        Value of the steps performed by the engine are fixed in field "Motor steps per circle". Your can edit
+        value, if necessary.
+
+Backup turntable settings to the file
+    Application seettings, including connection settings, calibration settings and four
+    presets can be saved to a file on your smartphone. To do this, open the sidebar and click on the item
+    "Backup turntable". In the dialog, specify the file name and comment.
+    To restore the settings from file, open the sidebar and click "Restore turntable." In the appeared window
+    select the settings file and click on it.
+    You can delete the settings files. To do this, click on the item in the file list and hold it. You will pass
+    into selection mode. If necessary, select other files by clicking on them, or select all files by clicking
+    button "". Delete the selected files by clicking on the "" icon in the toolbar.
+
+
+

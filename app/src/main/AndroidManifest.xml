@@ -80,6 +80,15 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".HelpActivity"
+            android:parentActivityName=".MainActivity">
+            <intent-filter>
+                <action android:name="intent.action.photo360_help" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>
