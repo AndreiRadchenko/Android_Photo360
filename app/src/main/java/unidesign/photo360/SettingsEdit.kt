@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.Toolbar
 import android.util.Log
+import android.view.Gravity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -70,7 +71,10 @@ class SettingsEdit : AppCompatActivity() {
                 calibrateSettings.direction = 1
                 calibrateSettings.allSteps = -1 //calibration mod
                 calibrateSettings.speed = et_callSpeed.text.toString().toInt()
+                //Log.d("SettingsEdit-call-speed", calibrateSettings.speed.toString())
                 calibrateSettings.state = "start"
+                //settingsPrefs.saveSettings(calibrateSettings)
+                //settingsPrefs.setChanges(4, calibrateSettings)
 //                calibrate_button.setText(R.string.stop_calibrate_btn)
 
                 try {
@@ -163,7 +167,8 @@ class SettingsEdit : AppCompatActivity() {
                     settingsPrefs.setChanges(p, oldSet)
                 }*/
 
-                Toast.makeText(applicationContext, R.string.preferences_saved, Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext, getString(R.string.settings_saved), Toast.LENGTH_LONG).show()
+                MainActivity.drawer.closeDrawer(Gravity.LEFT, false)
                 finish()
                 return true
             }

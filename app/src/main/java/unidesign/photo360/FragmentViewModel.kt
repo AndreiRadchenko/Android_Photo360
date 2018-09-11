@@ -36,6 +36,7 @@ class FragmentViewModel(var app: Application, var page: Int) : AndroidViewModel(
         var newSet = postSettings.value
         newSet!!.allSteps = calibrateSettings.allSteps
         newSet!!.state = calibrateSettings.state
+        newSet!!.speed = calibrateSettings.speed
         postSettings.value = newSet
 
     }

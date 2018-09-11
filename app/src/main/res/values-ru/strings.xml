@@ -33,8 +33,8 @@
     <string name="help_locale">en</string>
 
     <!--string name="sam_explanation">Sam explanation of calibration process</string-->
-    <string name="sam_explanation">Calibration procedure. \n\n1) Set the speed of the engine during calibration. \n2) Set the label in front of the engine shaft. \n3) Click the "CALIBRATE" button.
-\n4) Wait for the label make a full turn and again will be in front of the engine shaft. Press "STOP". \n Edit value, if necessary.
+    <string name="sam_explanation">Калибровка. \n1) Задайте скорость вращения двигателя в процессе калибровки. \n2) Установите метку напротив вала двигателя. \n3) Нажмите кнопку "калибровка"
+\n4) Подождите пока метка совершит полный круг и снова окажется напротив вала двигателя. Нажмите "стоп". \nВ случае необходимости отредактируйте значение.
 </string>
 
     <string name="comment">Comment</string>

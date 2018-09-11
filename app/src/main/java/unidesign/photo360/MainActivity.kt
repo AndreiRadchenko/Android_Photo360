@@ -518,10 +518,10 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             }
 
             R.id.action_settings -> {
-                if (btnRunCW.isEnabled )
+/*                if (btnRunCW.isEnabled )
                     disableButton()
                 else
-                    enableButton()
+                    enableButton()*/
                 return true
             }
 
