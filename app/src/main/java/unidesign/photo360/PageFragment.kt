@@ -18,7 +18,7 @@ import android.animation.ValueAnimator
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.animation.PropertyValuesHolder
 import android.util.Log
-import unidesign.photo360.MainActivity.Companion.runningFragmentId
+//import unidesign.photo360.MainActivity.Companion.runningFragmentId
 
 
 class PageFragment : Fragment() {
@@ -34,6 +34,7 @@ class PageFragment : Fragment() {
     var page: Int = 0
     lateinit var viewModel: FragmentViewModel
     lateinit var modeArray: Array<String>
+    var mrunFragment: Int = MainActivity.NO_FRAGMENT_RUNNING
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_page, container, false)
@@ -88,8 +89,11 @@ class PageFragment : Fragment() {
     }
 
     override fun onResume() {
+        //var settingsPrefs = SettingsPreferences(activity.applicationContext)
+        mrunFragment = MainActivity.runningFragmentId
+        Log.d("PageFragment.onResume", "mrunFragment = $mrunFragment")
         viewModel.initPreferencesRequest()
-        if (page == runningFragmentId)
+        if (page == mrunFragment)
             viewModel.setChanges2View(MainActivity.postSettings.framesLeft)
 
         super.onResume()
@@ -159,8 +163,8 @@ class PageFragment : Fragment() {
     @Subscribe(threadMode = ThreadMode.MAIN, priority = 1)
     public fun onMessage(event: wsMessage){
         Log.d("PageFragment.onMessage", Settings.FRAMES_LEFT + ": " + event.framesLeft)
-        Log.d("PageFragment.onMessage", "page = $page, MainActivity.runningFragmentId = " + runningFragmentId)
-        if (page == runningFragmentId)
+        Log.d("PageFragment.onMessage", "page = $page, MainActivity.runningFragmentId = " + MainActivity.runningFragmentId)
+        if (page == MainActivity.runningFragmentId)
             viewModel.setChanges2View(event.framesLeft)
     }
 

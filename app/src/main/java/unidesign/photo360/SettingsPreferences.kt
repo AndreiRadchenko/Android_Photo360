@@ -8,10 +8,21 @@ import org.json.JSONObject
 class SettingsPreferences(_context: Context) {
 
     var mcontext: Context// = _context
+    internal var pref: SharedPreferences
+    internal var editor: SharedPreferences.Editor
 
     init  {
         mcontext = _context
+        pref = _context.getSharedPreferences(Preset.PREF_NAME, Preset.PRIVATE_MODE)
+        editor = pref.edit()
     }
+
+    var runningFragmentId: Int
+        get() = pref.getInt("runningFragmentId", 100)
+        set(fragmentId) {
+            editor.putInt("runningFragmentId", fragmentId)
+            editor.commit()
+        }
 
     var presetArray = arrayOf(Preset(mcontext, PRESET_1), Preset(mcontext, PRESET_2), Preset(mcontext, PRESET_3),
             Preset(mcontext, PRESET_4), Preset(mcontext, CALIBRATION))

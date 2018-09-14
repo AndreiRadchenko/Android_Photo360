@@ -8,7 +8,7 @@ class Preset(_context: Context, page: Int) {
     internal var pref: SharedPreferences
     internal var editor: SharedPreferences.Editor
     internal val defaultSettings = Settings().getJSON().toString()
-    internal var PRIVATE_MODE = 0
+    //internal var PRIVATE_MODE = 0
     internal var mpage: Int
 
     init {
@@ -20,7 +20,8 @@ class Preset(_context: Context, page: Int) {
     companion object {
 
         // Shared preferences file name
-        private val PREF_NAME = "Main4_preferences"
+        val PREF_NAME = "Main4_preferences"
+        val PRIVATE_MODE = 0
 
         private val PRESET_1 = "preset1"
         private val PRESET_2 = "preset2"

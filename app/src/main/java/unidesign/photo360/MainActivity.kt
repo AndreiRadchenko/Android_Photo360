@@ -177,6 +177,8 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         pageAdapter = PageAdapter(supportFragmentManager)
         var displayMetrics: DisplayMetrics? = null
 
+        //runningFragmentId = settingsPrefs.runningFragmentId
+        Log.d("MainActivity.OnCreate", "runningFragmentId = $runningFragmentId")
         // create fragments from 0 to 9
         for (i in 0..3) {
             pageAdapter.add(PageFragment.newInstance(i), "Tab$i")
@@ -206,10 +208,11 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                         buttonStopState()}
                 })
 
-        postSettings = Settings(settingsPrefs.presetArray[0].get() ?: Settings().getJSON().toString())
+        //postSettings = Settings(settingsPrefs.presetArray[0].get() ?: Settings().getJSON().toString())
 
         btnRunCW.setOnClickListener(View.OnClickListener {
             runningFragmentId = mViewPager.currentItem
+            //settingsPrefs.runningFragmentId = mViewPager.currentItem
             Log.d("OnClickListener()", "runningFragmentId: " + runningFragmentId)
             //runningFragmentId = mViewPager.currentItem
             var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
@@ -234,6 +237,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         })
         btnRunCCW.setOnClickListener(View.OnClickListener {
             runningFragmentId = mViewPager.currentItem
+            //settingsPrefs.runningFragmentId = mViewPager.currentItem
             //runningFragmentId = mViewPager.currentItem
             var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
             postSettings = currentFragment.viewModel.getPreset().value ?: Settings()
@@ -326,28 +330,32 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     }
 
     override fun onResume() {
-        super.onResume()
 
+        Log.d("onResume()", "runningFragmentId: " + runningFragmentId)
         if (wsConnected)
         {
             menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected))
+
+/*            if (runningFragmentId != NO_FRAGMENT_RUNNING) {
+                //postSettings = Settings(settingsPrefs.presetArray[currentFragmentId].get())
+                //postSettings.state = "started"
+                disableButton()
+                Handler().postDelayed(Runnable() {
+                    //do something
+                    viewModel.setSettings(postSettings)
+                }, 2000//time in milisecond
+                )
+            }
+            else*/
             viewModel.setSettings(postSettings)
         }
 
         if (runningFragmentId == NO_FRAGMENT_RUNNING)
             mViewPager.currentItem = currentFragmentId
         else
-/*        Log.d("onResume()", "runningFragmentId: " + runningFragmentId)
-        Log.d("onResume()", "currentFragmentId: " + currentFragmentId)*/
             mViewPager.currentItem = runningFragmentId
 
- /*       if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        {
-            if(checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED)
-            {
-                requestPermissions(Array<String>(1){Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_WIFI);
-            }
-        }*/
+        super.onResume()
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -364,6 +372,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         EventBus.getDefault().unregister(this)
         unregisterReceiver(wifiScanReceiver)
         TurntableConectionJob.cancel()
+        Log.d("MainActivity.onStop()", "MainActivity.onStop()")
         super.onStop()
         //disconnectWebSocket()
     }
@@ -371,10 +380,13 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
     override fun onPause() {
         currentFragmentId = mViewPager.currentItem
         //runningFragmentId = runningFragmentId
+        Log.d("MainActivity.onPause()", "currentFragmentId = $currentFragmentId")
         super.onPause()
     }
 
     override fun onDestroy() {
+        //settingsPrefs.runningFragmentId = runningFragmentId
+        Log.d("MainActivity.onDestroy", "runningFragmentId = $runningFragmentId")
         super.onDestroy()
     }
 
