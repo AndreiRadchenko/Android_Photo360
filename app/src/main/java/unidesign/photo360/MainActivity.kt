@@ -204,6 +204,8 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                     Log.d("App ViewModel Observ", "set?.state = " + set?.state)
                     if (set?.state == "waiting" || set?.state == "stop")
                         buttonStartState()
+                    else if (set?.state == "pause")
+                        buttonPauseState()
                     else
                         buttonStopState()}
                 })
@@ -211,22 +213,28 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         //postSettings = Settings(settingsPrefs.presetArray[0].get() ?: Settings().getJSON().toString())
 
         btnRunCW.setOnClickListener(View.OnClickListener {
-            runningFragmentId = mViewPager.currentItem
-            //settingsPrefs.runningFragmentId = mViewPager.currentItem
-            Log.d("OnClickListener()", "runningFragmentId: " + runningFragmentId)
-            //runningFragmentId = mViewPager.currentItem
-            var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
-            postSettings = currentFragment.viewModel.getPreset().value ?: Settings()
 
-            postSettings.direction = 0
-            postSettings.state = "start"
-            //postSettings.presetFragment = currentFragmentId
-            viewModel.setSettings(postSettings)
-            //viewModel.setRunningFragment(currentFragmentId)
-            //viewModel.setTtRun(true)
-//            buttonStopState()
-//            sharedPrefs?.direction = 1
-//            sharedPrefs?.state = "start"
+            if (postSettings.state == "pause") {
+                Log.d("MainActivity.btnRunCW", "postSettings.state = " + postSettings.state)
+                postSettings.state = "started"
+
+            }
+
+            else {
+
+                runningFragmentId = mViewPager.currentItem
+                //settingsPrefs.runningFragmentId = mViewPager.currentItem
+                Log.d("OnClickListener()", "runningFragmentId: " + runningFragmentId)
+                //runningFragmentId = mViewPager.currentItem
+                var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
+                postSettings = currentFragment.viewModel.getPreset().value ?: Settings()
+
+                postSettings.direction = 0
+                postSettings.state = "start"
+                //postSettings.presetFragment = currentFragmentId
+                viewModel.setSettings(postSettings)
+            }
+
             try {
                 mWebSocketClient!!.send(postSettings.getJSON().toString())
             }
@@ -258,21 +266,29 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             }
         })
         btnSTOP.setOnClickListener(View.OnClickListener {
+            if (postSettings.state == "started") {
+                Log.d("MainActivity.btnSTOP", "postSettings.state = " + postSettings.state)
+                postSettings.state = "pause"
+
+            }
             //sharedPrefs?.state = "stop"
             //currentFragmentId = mViewPager.currentItem
             //var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
             //postSettings = Settings(currentFragment.viewModel.getPreset(currentFragmentId).value ?:
             //                                Settings().getJSON().toString())
-            if (runningFragmentId == NO_FRAGMENT_RUNNING)
-                runningFragmentId = mViewPager.currentItem
-            var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
-            if (currentFragment != null)
-                currentFragment.viewModel.initPreferencesRequest()
-            postSettings.state = "stop"
-            //postSettings.framesLeft = postSettings.frame
-            viewModel.setSettings(postSettings)
-            //viewModel.setTtRun(false)
-            //buttonStartState()
+            else if (postSettings.state == "pause"){
+                Log.d("MainActivity.btnSTOP", "postSettings.state = " + postSettings.state)
+                if (runningFragmentId == NO_FRAGMENT_RUNNING)
+                    runningFragmentId = mViewPager.currentItem
+                var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
+                if (currentFragment != null)
+                    currentFragment.viewModel.initPreferencesRequest()
+                postSettings.state = "stop"
+                //postSettings.framesLeft = postSettings.frame
+                viewModel.setSettings(postSettings)
+                //viewModel.setTtRun(false)
+                //buttonStartState()
+            }
             try {
                 mWebSocketClient!!.send(postSettings.getJSON().toString())
             }
@@ -301,23 +317,6 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         postSettings.state = event.state
         viewModel.setSettings(postSettings)
     }
-
-/*    override fun onSaveInstanceState(savedInstanceState: Bundle)
-    {
-        super.onSaveInstanceState(savedInstanceState)
-        savedInstanceState.putInt("FragmentId", currentFragmentId)
-        savedInstanceState.putInt("runFragmentId", runningFragmentId)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle)
-    {
-        super.onRestoreInstanceState(savedInstanceState)
-        currentFragmentId = savedInstanceState.getInt("FragmentId")
-        runningFragmentId = savedInstanceState.getInt("runFragmentId")
-        Log.d("onRestoreInstanceState", "runningFragmentId: " + runningFragmentId)
-        Log.d("onRestoreInstanceState", "currentFragmentId: " + currentFragmentId)
-
-    }*/
 
     override fun onBackPressed() {
         val drawer: DrawerLayout = findViewById(R.id.drawer_layout)
@@ -485,6 +484,16 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         btnSTOP.isEnabled = true
         //runningFragmentId = NO_FRAGMENT_RUNNING
         btnRunCW.setImageResource(R.drawable.clockwise_disable)
+        btnRunCCW.setImageResource(R.drawable.anticlockwise_disable)
+        btnSTOP.setImageResource(R.drawable.redbutton)
+    }
+
+    private fun buttonPauseState() {
+        //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        btnRunCW.isEnabled = true
+        btnRunCCW.isEnabled = false
+        btnSTOP.isEnabled = true
+        btnRunCW.setImageResource(R.drawable.clockwise)
         btnRunCCW.setImageResource(R.drawable.anticlockwise_disable)
         btnSTOP.setImageResource(R.drawable.redbutton)
     }
