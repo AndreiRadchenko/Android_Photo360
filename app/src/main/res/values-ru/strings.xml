@@ -4,70 +4,73 @@
 
 <resources>
     <string name="app_name">&app_name;</string>
-    <string name="action_connect">Connect to turntable</string>
-    <string name="action_settings">Settings</string>
-    <string name="preset_name">Preset name</string>
-    <string name="preset_frame">Frames number</string>
-    <string name="preset_delay">Shooting delay (ms)</string>
-    <string name="delay">Delay (ms)</string>
-    <string name="preset_speed">Speed</string>
+    <string name="action_connect">Подключится к платформе</string>
+    <string name="action_settings">Настройки</string>
+    <string name="preset_name">Название пресета</string>
+    <string name="preset_frame">Количество кадров</string>
+    <string name="preset_delay">Задержка затвора (мс)</string>
+    <string name="delay">Задержка (мс)</string>
+    <string name="preset_speed">Скорость вращения</string>
     <string name="preset_acceleration">Acceleration</string>
-    <string name="preset_edit_form">Preset edit</string>
-    <string name="settings_edit_form">Settings</string>
-    <string name="shooting_mode">Shooting mode</string>
-    <string name="action_save">Save</string>
-    <string name="preferences_saved">Preset saved</string>
-    <string name="param1_label">Frames</string>
-    <string name="naw_settings">Settings</string>
-    <string name="naw_save">Backup turntable</string>
-    <string name="naw_restore">Restore turntable</string>
-    <string name="naw_help">Help</string>
+    <string name="preset_edit_form">Редактирование пресета</string>
+    <string name="settings_edit_form">Настройки</string>
+    <string name="shooting_mode">Режим сьемки</string>
+    <string name="action_save">Сохранить</string>
+    <string name="preferences_saved">Пресет сохранен</string>
+    <string name="naw_settings">Настройки</string>
+    <string name="naw_save">Резервная копия</string>
+    <string name="naw_restore">Восстановить копию</string>
+    <string name="naw_help">Помощь</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="turntable_wifi_ssid">Turntable WiFi SSID</string>
-    <string name="turntable_wifi_password">Turntable WiFi password</string>
-    <string name="motors_steps_per_circle">Motors steps per circle</string>
-    <string name="start_calibrate_btn">Calibrate</string>
-    <string name="stop_calibrate_btn">Stop</string>
-    <string name="action_help">Help</string>
-    <string name="help_locale">en</string>
+    <string name="turntable_wifi_ssid">Название WiFi сети платформы</string>
+    <string name="turntable_wifi_password">Пароль WiFi сети платформы</string>
+    <string name="motors_steps_per_circle">Количество шагов двигателя на круг</string>
+    <string name="start_calibrate_btn">Калибровка</string>
+    <string name="stop_calibrate_btn">Стоп</string>
+    <string name="action_help">Помощь</string>
+    <string name="help_locale">ru</string>
 
     <!--string name="sam_explanation">Sam explanation of calibration process</string-->
     <string name="sam_explanation">Калибровка. \n1) Задайте скорость вращения двигателя в процессе калибровки. \n2) Установите метку напротив вала двигателя. \n3) Нажмите кнопку "калибровка"
 \n4) Подождите пока метка совершит полный круг и снова окажется напротив вала двигателя. Нажмите "стоп". \nВ случае необходимости отредактируйте значение.
 </string>
 
-    <string name="comment">Comment</string>
-    <string name="too_fast_rotation">Rotation to fast for non stop mode. Please, decrees speed or frames number</string>
-    <string name="backup_name">Backup name</string>
-    <string name="backupDialogTitle">Backup turntable settings</string>
-    <string name="no_sdcard">External SD card is inaccessible</string>
-    <string name="Backup_sucsess">Backup %1$s is added</string>
-    <string name="Enter_file_name">Enter backup file name</string>
-    <string name="dialog_def_msg">Save presets to file</string>
-    <string name="enter_backup_name">Please, enter backup file name</string>
-    <string name="callibration_speed">Callibration speed</string>
-    <string name="turntable_not_found">Turntable WiFi not found</string>
-    <string name="storage_denied">Permission to storage denied</string>
-    <string name="select_all">Select all</string>
-    <string name="delete_selection">delete selection</string>
-    <string name="action_selection_settings">settings</string>
-    <string name="restore_select_title">selected</string>
+    <string name="comment">Комментарий</string>
+    <string name="too_fast_rotation">Слишком большая скорость вращения. Пожалуйста уменьшите скорость, или количество кадров</string>
+    <string name="backup_name">Название резервной копии</string>
+    <string name="backupDialogTitle">Сохранить настройки платформы</string>
+    <string name="no_sdcard">SD катра недоступна</string>
+    <string name="Backup_sucsess">Добавлена резервная копия %1$s</string>
+    <string name="Enter_file_name">Введите название файла резервной копии</string>
+    <string name="dialog_def_msg">Сохранить пресеты в файл</string>
+    <string name="enter_backup_name">Введите название резервной копии</string>
+    <string name="callibration_speed">Скорость калибровки</string>
+    <string name="turntable_not_found">WiFi сеть платформы не найдена</string>
+    <string name="storage_denied">Доступ к памяти телефона запрещен</string>
+    <string name="select_all">выбрать все</string>
+    <string name="delete_selection">удалить выбранное</string>
+    <string name="action_selection_settings">настройки</string>
+    <string name="restore_select_title">выбрано</string>
 
-    <string name="BackupRestoredMessage">Backup %1$s restored</string>
-    <string name="restore_activity_form">Restore backup</string>
-    <string name="ext_stor_perm_denied">Permission Denied, You cannot access External storage.</string>
-    <string name="mode">Mode</string>
-    <string name="settings_saved">Settings saved</string>
+    <string name="BackupRestoredMessage">Восстановлена резервная копия %1$s</string>
+    <string name="restore_activity_form">Восстановить резервную копию</string>
+    <string name="ext_stor_perm_denied">Доступ запрещен, Вы не имеете доступа к памяти телефона.</string>
+    <string name="mode">Режим</string>
+    <string name="settings_saved">Настройки сохранены</string>
+    <string name="turntable_connected">Подключение установлено</string>
+    <string name="turntable_disconnected">Подключение разорвано</string>
 
     <plurals name="Deleted_backup_message">
-        <item quantity="one">Deleted %1$d backup</item>
-        <item quantity="other">Deleted %1$d backups</item>
+        <item quantity="one">Удалена %1$d резервная копия</item>
+        <item quantity="few">Удалены %1$d резервные копии</item>
+        <item quantity="many">Удалены %1$d резервных копий</item>
+        <item quantity="other">Удалены %1$d резервных копий</item>
     </plurals>
 
     <string-array name="shootingmode_array">
-        <item>Interval</item>
-        <item>Non stop</item>
+        <item>Интервал</item>
+        <item>Без остановок</item>
     </string-array>
 
     <!--string-array name="shootingmode_array">

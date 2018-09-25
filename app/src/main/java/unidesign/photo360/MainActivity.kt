@@ -210,18 +210,13 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                         buttonStopState()}
                 })
 
-        //postSettings = Settings(settingsPrefs.presetArray[0].get() ?: Settings().getJSON().toString())
-
         btnRunCW.setOnClickListener(View.OnClickListener {
 
             if (postSettings.state == "pause") {
                 Log.d("MainActivity.btnRunCW", "postSettings.state = " + postSettings.state)
                 postSettings.state = "started"
-
             }
-
             else {
-
                 runningFragmentId = mViewPager.currentItem
                 //settingsPrefs.runningFragmentId = mViewPager.currentItem
                 Log.d("OnClickListener()", "runningFragmentId: " + runningFragmentId)
@@ -244,19 +239,19 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
             }
         })
         btnRunCCW.setOnClickListener(View.OnClickListener {
-            runningFragmentId = mViewPager.currentItem
-            //settingsPrefs.runningFragmentId = mViewPager.currentItem
-            //runningFragmentId = mViewPager.currentItem
-            var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
-            postSettings = currentFragment.viewModel.getPreset().value ?: Settings()
 
-            postSettings.direction = 1
-            postSettings.state = "start"
-            viewModel.setSettings(postSettings)
-            //viewModel.setTtRun(true)
-//            buttonStopState()
-//            sharedPrefs?.direction = 0
-//            sharedPrefs?.state = "start"
+            if (postSettings.state == "pause") {
+                postSettings.state = "started"
+            }
+            else {
+                runningFragmentId = mViewPager.currentItem
+                var currentFragment = pageAdapter.getItem(runningFragmentId) as PageFragment
+                postSettings = currentFragment.viewModel.getPreset().value ?: Settings()
+
+                postSettings.direction = 1
+                postSettings.state = "start"
+                viewModel.setSettings(postSettings)
+            }
             try {
                 mWebSocketClient!!.send(postSettings.getJSON().toString())
             }
@@ -433,19 +428,6 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         return true
     }
 
-/*    @Subscribe(threadMode = ThreadMode.MAIN)
-    public fun onMessage(event: wsMessage){
-        var currentFragment = pageAdapter.getItem(currentFragmentId) as PageFragment
-        if (currentFragment.isVisible) {
-            //var currentFragment = pageAdapter.getItem(currentFragmentId)
-
-            framesLeftTxt = currentFragment.view!!.findViewById(R.id.frames_left_txt)
-            framesLeftTxt.setText(event.framesLeft)
-            framesLeftTxt.invalidate()
-        }
-    //mytextview.setText(event.message);
-    }*/
-
     private fun disableButton() {
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
         btnRunCW.isEnabled = false
@@ -453,7 +435,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         btnSTOP.isEnabled = false
         btnRunCW.setImageResource(R.drawable.clockwise_disable)
         btnRunCCW.setImageResource(R.drawable.anticlockwise_disable)
-        btnSTOP.setImageResource(R.drawable.redbutton_disable)
+        btnSTOP.setImageResource(R.drawable.pause_disable)
     }
 
     private fun enableButton() {
@@ -474,7 +456,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         runningFragmentId = NO_FRAGMENT_RUNNING
         btnRunCW.setImageResource(R.drawable.clockwise)
         btnRunCCW.setImageResource(R.drawable.anticlockwise)
-        btnSTOP.setImageResource(R.drawable.redbutton_disable)
+        btnSTOP.setImageResource(R.drawable.pause_disable)
     }
 
     private fun buttonStopState() {
@@ -485,17 +467,28 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         //runningFragmentId = NO_FRAGMENT_RUNNING
         btnRunCW.setImageResource(R.drawable.clockwise_disable)
         btnRunCCW.setImageResource(R.drawable.anticlockwise_disable)
-        btnSTOP.setImageResource(R.drawable.redbutton)
+        btnSTOP.setImageResource(R.drawable.pause)
     }
 
     private fun buttonPauseState() {
         //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-        btnRunCW.isEnabled = true
-        btnRunCCW.isEnabled = false
-        btnSTOP.isEnabled = true
-        btnRunCW.setImageResource(R.drawable.clockwise)
-        btnRunCCW.setImageResource(R.drawable.anticlockwise_disable)
-        btnSTOP.setImageResource(R.drawable.redbutton)
+        if (postSettings.direction == 0) {
+            btnRunCW.isEnabled = true
+            btnRunCCW.isEnabled = false
+            btnSTOP.isEnabled = true
+            btnRunCW.setImageResource(R.drawable.clockwise)
+            btnRunCCW.setImageResource(R.drawable.anticlockwise_disable)
+            btnSTOP.setImageResource(R.drawable.redbutton)
+        }
+        else {
+            btnRunCW.isEnabled = false
+            btnRunCCW.isEnabled = true
+            btnSTOP.isEnabled = true
+            btnRunCW.setImageResource(R.drawable.clockwise_disable)
+            btnRunCCW.setImageResource(R.drawable.anticlockwise)
+            btnSTOP.setImageResource(R.drawable.redbutton)
+        }
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -664,7 +657,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                     wsConnected = true
                     menu?.getItem(0)?.setIcon(applicationContext.getDrawable(R.drawable.ic_action_connected))
                     mprogresBar.visibility = View.INVISIBLE
-                    Toast.makeText(application, "Turntable connected", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(application, getString(R.string.turntable_connected), Toast.LENGTH_SHORT).show()
                     buttonStartState()
                 }
             }
@@ -697,7 +690,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                     wsConnected = false
                     mprogresBar.visibility = View.INVISIBLE
                     menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect))
-                    Toast.makeText(application, "Turntable disconnected", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(application, getString(R.string.turntable_disconnected), Toast.LENGTH_SHORT).show()
                     disableButton()
                 }
             }
@@ -709,7 +702,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
                     wsConnected = false
                     mprogresBar.visibility = View.INVISIBLE
                     menu?.getItem(0)?.setIcon(getDrawable(R.drawable.ic_action_connect))
-                    Toast.makeText(application, "Turntable not found", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(application, getString(R.string.turntable_not_found), Toast.LENGTH_SHORT).show()
                     disableButton()
                 }
             }
