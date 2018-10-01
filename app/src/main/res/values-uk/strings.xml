@@ -1,0 +1,84 @@
+<!DOCTYPE resources [
+    <!ENTITY app_name "Photo360">
+    ]>
+
+<resources>
+    <string name="app_name">&app_name;</string>
+    <string name="action_connect">Підключитись до платформи</string>
+    <string name="action_settings">Налаштування</string>
+    <string name="preset_name">Назва пресета</string>
+    <string name="preset_frame">Кількість кадрів</string>
+    <string name="preset_delay">Затримка затвора (мс)</string>
+    <string name="delay">Затримка (мс)</string>
+    <string name="preset_speed">Швидкість</string>
+    <string name="preset_acceleration">Acceleration</string>
+    <string name="preset_edit_form">Редагування пресета</string>
+    <string name="settings_edit_form">Налаштування</string>
+    <string name="shooting_mode">Режим з\'йомки</string>
+    <string name="action_save">Зберегти</string>
+    <string name="preferences_saved">Пресет збережено</string>
+    <string name="naw_settings">Налаштування</string>
+    <string name="naw_save">Резервна копія</string>
+    <string name="naw_restore">Відновити копію</string>
+    <string name="naw_help">Допомога</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="turntable_wifi_ssid">Назва WiFi мережі платформи</string>
+    <string name="turntable_wifi_password">Пароль WiFi мережі платформи</string>
+    <string name="motors_steps_per_circle">Кількість кроків мотора на круг</string>
+    <string name="start_calibrate_btn">Калібрування</string>
+    <string name="stop_calibrate_btn">Стоп</string>
+    <string name="action_help">Допомога</string>
+    <string name="help_locale">uk</string>
+
+    <!--string name="sam_explanation">Sam explanation of calibration process</string-->
+    <string name="sam_explanation">Калібрування. \n1) Задайте швидкість обертання мотора під час калібрування.
+        \n2) Встановіть мітку навпроти вала мотора. \n3) Натисніть кнопку "КАЛІБРУВАННЯ"
+        \n4) Зачекайте поки мітка здійснить повний оберт і знову буде навпроти вала мотора. Натисніть "СТОП"
+        \n В разі необхідності - відредагуйте значення.
+</string>
+
+    <string name="comment">Коментар</string>
+    <string name="too_fast_rotation">Надто велика швидкість обертання. Будь ласка, зменшіть швидкість чи кількість кадрів</string>
+    <string name="backup_name">Назва резервної копії</string>
+    <string name="backupDialogTitle">Зберегти налаштування платформи</string>
+    <string name="no_sdcard">SD катра недоступна</string>
+    <string name="Backup_sucsess">Додана резервна копія %1$s</string>
+    <string name="Enter_file_name">Введіть назву файла резервної копії</string>
+    <string name="dialog_def_msg">Зберегти пресети в файл</string>
+    <string name="enter_backup_name">Введіть назву резервної копії</string>
+    <string name="callibration_speed">Швидкість калібрування</string>
+    <string name="turntable_not_found">WiFi мережа платформи не знайдена</string>
+    <string name="storage_denied">Доступ до пам\'яті телефону заборонений</string>
+    <string name="select_all">Вибрати все</string>
+    <string name="delete_selection">Видалити обране</string>
+    <string name="action_selection_settings">Налаштування</string>
+    <string name="restore_select_title">обрано</string>
+
+    <string name="BackupRestoredMessage">Відновлена резервна копія %1$s</string>
+    <string name="restore_activity_form">Відновити резервну копію</string>
+    <string name="ext_stor_perm_denied">Доступ заборонено, Ви не маєте доступ до пам\'яті телефона.</string>
+    <string name="mode">Режим</string>
+    <string name="settings_saved">Налаштування збережені</string>
+    <string name="turntable_connected">Підключення встановлено</string>
+    <string name="turntable_disconnected">Підключення розірвано</string>
+
+    <plurals name="Deleted_backup_message">
+        <item quantity="one">Видалена %1$d резервна копія</item>
+        <item quantity="few">Видалені %1$d резервні копії</item>
+        <item quantity="many">Видалені %1$d резервних копій</item>
+        <item quantity="other">Видалені %1$d резервних копій</item>
+    </plurals>
+
+    <string-array name="shootingmode_array">
+        <item>Інтервал</item>
+        <item>Без зупинок</item>
+    </string-array>
+
+    <!--string-array name="shootingmode_array">
+        <item>Interval</item>
+        <item>Ping-Pong</item>
+        <item>Seria</item>
+        <item>Non stop</item>
+    </string-array-->
+</resources>

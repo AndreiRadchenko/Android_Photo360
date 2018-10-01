@@ -33,8 +33,8 @@
     <string name="help_locale">en</string>
 
     <!--string name="sam_explanation">Sam explanation of calibration process</string-->
-    <string name="sam_explanation">Calibration procedure. \n\n1) Set the speed of the engine during calibration. \n2) Set the label in front of the engine shaft. \n3) Click the "CALIBRATE" button.
-\n4) Wait for the label make a full turn and again will be in front of the engine shaft. Press "STOP". \n Edit value, if necessary.
+    <string name="sam_explanation">Calibration procedure. \n\n1) Set the speed of the motor during calibration. \n2) Set the label in front of the motor shaft. \n3) Click the "CALIBRATE" button.
+\n4) Wait for the label make a full turn and again will be in front of the motor shaft. Press "STOP". \n Edit value, if necessary.
 </string>
 
     <string name="comment">Comment</string>

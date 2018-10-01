@@ -60,9 +60,7 @@ class RestoreTask(private val mContext: Context, var RA: RestoreActivity) : Asyn
         Log.d("RestoreTask", "item.filepath $filepath" )
         var RestoreJson = getStringFromFile(filepath)
 
-        restoreJSON2settingsPref(RestoreJson)
-
-        return filepath
+        return restoreJSON2settingsPref(RestoreJson)
     }
 
     override fun onPostExecute(strJson: String) {
@@ -106,7 +104,7 @@ class RestoreTask(private val mContext: Context, var RA: RestoreActivity) : Asyn
         return line1
     }
 
-    internal fun restoreJSON2settingsPref(jsonstr: String) {
+    internal fun restoreJSON2settingsPref(jsonstr: String): String {
 
         var dataJsonObj: JSONObject? = null
         var datafild: String? = null
@@ -138,6 +136,7 @@ class RestoreTask(private val mContext: Context, var RA: RestoreActivity) : Asyn
         } catch (e: JSONException) {
             e.printStackTrace()
         }
+        return dataJsonObj!!.getString("filename")
 
     }
 
