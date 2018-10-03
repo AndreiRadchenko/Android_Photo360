@@ -31,6 +31,7 @@ class PageFragment : Fragment() {
     lateinit var param4_txt: TextView
     lateinit var turntabe: TurntableView
     lateinit var valueAnimator: ValueAnimator
+    lateinit var ivSettings: ImageView
     var page: Int = 0
     lateinit var viewModel: FragmentViewModel
     lateinit var modeArray: Array<String>
@@ -47,7 +48,7 @@ class PageFragment : Fragment() {
         param2_txt = view.findViewById(R.id.param2_value)
         param3_txt = view.findViewById(R.id.param3_value)
         param4_txt = view.findViewById(R.id.param4_value)
-        val ivSettings: ImageView = view.findViewById(R.id.preset_settings)
+        ivSettings = view.findViewById(R.id.preset_settings)
         turntabe = view.findViewById(R.id.turntable_view)
         turntabe.animation
 
@@ -94,7 +95,7 @@ class PageFragment : Fragment() {
         Log.d("PageFragment.onResume", "mrunFragment = $mrunFragment")
         viewModel.initPreferencesRequest()
         if (page == mrunFragment)
-            viewModel.setChanges2View(MainActivity.postSettings.framesLeft)
+            viewModel.setChanges2View(MainActivity.postSettings.framesLeft, MainActivity.postSettings.state)
 
         super.onResume()
     }
@@ -132,6 +133,12 @@ class PageFragment : Fragment() {
         }
         frames_txt.text = mSettings.framesLeft.toString()
 
+        when (mSettings.state) {
+            "waiting" -> ivSettings.isEnabled = true
+            "stop" -> ivSettings.isEnabled = true
+            else -> ivSettings.isEnabled = false
+        }
+
         var prevAnimValue: Float
         var animValue: Float
 
@@ -165,7 +172,7 @@ class PageFragment : Fragment() {
         Log.d("PageFragment.onMessage", Settings.FRAMES_LEFT + ": " + event.framesLeft)
         Log.d("PageFragment.onMessage", "page = $page, MainActivity.runningFragmentId = " + MainActivity.runningFragmentId)
         if (page == MainActivity.runningFragmentId)
-            viewModel.setChanges2View(event.framesLeft)
+            viewModel.setChanges2View(event.framesLeft, event.state)
     }
 
 /*    private fun createAnimator(): ValueAnimator {

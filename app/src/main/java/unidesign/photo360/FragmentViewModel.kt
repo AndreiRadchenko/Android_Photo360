@@ -25,9 +25,10 @@ class FragmentViewModel(var app: Application, var page: Int) : AndroidViewModel(
         postSettings.value = Settings(settingsPrefs.presetArray[page].get())
     }
 
-    fun setChanges2View(framesLeft: Int) {
+    fun setChanges2View(framesLeft: Int, mstate: String) {
         var newSet = postSettings.value
         newSet!!.framesLeft = framesLeft
+        newSet!!.state = mstate
         postSettings.value = newSet
 
     }

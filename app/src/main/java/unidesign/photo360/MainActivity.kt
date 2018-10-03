@@ -25,6 +25,8 @@ import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
 import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
+import android.support.v4.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
+import android.support.v4.widget.DrawerLayout.LOCK_MODE_UNLOCKED
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.widget.Toolbar
 import android.util.DisplayMetrics
@@ -202,12 +204,19 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
         viewModel.getSettings().
                 observe(this, Observer<Settings> { set -> run {
                     Log.d("App ViewModel Observ", "set?.state = " + set?.state)
-                    if (set?.state == "waiting" || set?.state == "stop")
+                    if (set?.state == "waiting" || set?.state == "stop") {
                         buttonStartState()
-                    else if (set?.state == "pause")
+                        drawer.setDrawerLockMode(LOCK_MODE_UNLOCKED)
+                    }
+                    else if (set?.state == "pause") {
                         buttonPauseState()
-                    else
-                        buttonStopState()}
+                        drawer.setDrawerLockMode(LOCK_MODE_LOCKED_CLOSED)
+                    }
+                    else {
+                        buttonStopState()
+                        drawer.setDrawerLockMode(LOCK_MODE_LOCKED_CLOSED)
+                    }
+                }
                 })
 
         btnRunCW.setOnClickListener(View.OnClickListener {
@@ -232,6 +241,7 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
 
             try {
                 mWebSocketClient!!.send(postSettings.getJSON().toString())
+//                drawer.setDrawerLockMode(LOCK_MODE_LOCKED_CLOSED)
             }
             catch (e: Exception) {
                 Toast.makeText(application, "Turnable not connected", Toast.LENGTH_SHORT).show()
