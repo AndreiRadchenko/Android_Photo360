@@ -9,6 +9,7 @@
     <string name="preset_name">Preset name</string>
     <string name="preset_frame">Frames number</string>
     <string name="preset_delay">Shooting delay (ms)</string>
+    <string name="preset_pause">Shooting pause (ms)</string>
     <string name="delay">Delay (ms)</string>
     <string name="preset_speed">Stepper speed</string>
     <string name="preset_acceleration">Acceleration</string>

@@ -19,11 +19,11 @@ import android.os.Handler
 import android.support.annotation.RequiresApi
 import android.support.design.widget.NavigationView
 import android.support.design.widget.TabLayout
+import android.support.v4.view.ViewPager
 import android.support.v4.app.ActivityCompat
 import android.support.v4.app.DialogFragment
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.GravityCompat
-import android.support.v4.view.ViewPager
 import android.support.v4.widget.DrawerLayout
 import android.support.v4.widget.DrawerLayout.LOCK_MODE_LOCKED_CLOSED
 import android.support.v4.widget.DrawerLayout.LOCK_MODE_UNLOCKED
@@ -36,7 +36,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import kotlinx.coroutines.experimental.*
+import kotlinx.coroutines.*
 //import com.sun.org.apache.xml.internal.serializer.utils.Utils.messages
 import org.java_websocket.WebSocket
 
@@ -46,8 +46,8 @@ import java.net.URI
 import java.net.URISyntaxException
 import org.java_websocket.drafts.Draft_6455
 import org.json.JSONObject
-import kotlin.coroutines.experimental.CoroutineContext
-import kotlinx.coroutines.experimental.android.UI
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.android.UI
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -314,10 +314,10 @@ class MainActivity : AppCompatActivity(),  NavigationView.OnNavigationItemSelect
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public fun onMessage(event: wsMessage){
-/*
-        Log.d("AcViewModel onMessage()", Settings.FRAMES_LEFT + ": " + postSettings.value?.framesLeft)
-        Log.d("AcViewModel onMessage()", Settings.STATE + ": " + postSettings.value?.state)
-*/
+
+//        Log.d("AcViewModel onMessage()", Settings.FRAMES_LEFT + ": " + postSettings.value?.framesLeft)
+//        Log.d("AcViewModel onMessage()", Settings.STATE + ": " + postSettings.value?.state)
+
         postSettings.framesLeft = event.framesLeft
         postSettings.state = event.state
         viewModel.setSettings(postSettings)

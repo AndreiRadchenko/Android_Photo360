@@ -24,6 +24,7 @@ class PresetEdit : AppCompatActivity() {
     lateinit var etFrame: EditText
     lateinit var etDelay: EditText
     lateinit var etSpeed: EditText
+    lateinit var etPause: EditText
     //lateinit var etAcceleration: EditText
     lateinit var etShootingMode: Spinner
     //lateinit var sharedPrefs: PreferenceManager
@@ -60,6 +61,7 @@ class PresetEdit : AppCompatActivity() {
         etFrame = findViewById<View>(R.id.etFrame) as EditText
         etDelay = findViewById<View>(R.id.etDelay) as EditText
         etSpeed = findViewById<View>(R.id.etSpeed) as EditText
+        etPause = findViewById<View>(R.id.etPause) as EditText
         //etAcceleration = findViewById<View>(R.id.etAcceleration) as EditText
         etShootingMode = findViewById<View>(R.id.etShootingMode) as Spinner
 
@@ -142,6 +144,7 @@ class PresetEdit : AppCompatActivity() {
         etFrame.setText(mSettings.frame.toString())
         etDelay.setText(mSettings.delay.toString())
         etSpeed.setText(mSettings.speed.toString())
+        etPause.setText(mSettings.pause.toString())
         //etAcceleration.setText(mSettings.acceleration.toString())
         etShootingMode.setSelection( shootingModemap.get(mSettings.shootingMode)!!)
         //= sharedPrefs.shootingMode
@@ -174,6 +177,7 @@ class PresetEdit : AppCompatActivity() {
                 oldSet.framesLeft = etFrame.text.toString().toInt()
                 oldSet.delay = etDelay.text.toString().toInt()
                 oldSet.speed = etSpeed.text.toString().toInt()
+                oldSet.pause = etPause.text.toString().toInt()
                 //oldSet.acceleration = etAcceleration.text.toString().toInt()
                 oldSet.shootingMode = getKeyByValue(shootingModemap, etShootingMode.selectedItemPosition) ?: "inter"
                 settingsPrefs.setChanges(page, oldSet)

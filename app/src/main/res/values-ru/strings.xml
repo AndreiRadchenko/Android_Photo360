@@ -9,6 +9,7 @@
     <string name="preset_name">Название пресета</string>
     <string name="preset_frame">Количество кадров</string>
     <string name="preset_delay">Задержка затвора (мс)</string>
+    <string name="preset_pause">Пауза затвора (мс)</string>
     <string name="delay">Задержка (мс)</string>
     <string name="preset_speed">Скорость</string>
     <string name="preset_acceleration">Acceleration</string>
@@ -17,6 +18,7 @@
     <string name="shooting_mode">Режим сьемки</string>
     <string name="action_save">Сохранить</string>
     <string name="preferences_saved">Пресет сохранен</string>
+    <string name="param1_label">Кадры</string>
     <string name="naw_settings">Настройки</string>
     <string name="naw_save">Резервная копия</string>
     <string name="naw_restore">Восстановить копию</string>
